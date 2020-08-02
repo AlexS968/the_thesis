@@ -8,7 +8,7 @@ public class GlobalSetting {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     //системное имя настройки
     @Column(nullable = false)

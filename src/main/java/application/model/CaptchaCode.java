@@ -10,19 +10,19 @@ public class CaptchaCode {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     //дата и время генерации кода капчи
-    @Column(columnDefinition = "DATETIME", nullable = false)
+    @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDate time;
 
     //код, отображаемый на картинке капчи
-    @Column(columnDefinition = "TINYTEXT", nullable = false)
+    @Column(length = 16, nullable = false)
     private String code;
 
     //код, передаваемый в параметре
     @NotBlank
-    @Column(name = "secret_code", columnDefinition = "TINYTEXT", nullable = false)
+    @Column(name = "secret_code", length = 16, nullable = false)
     private String secretCode;
 
 }

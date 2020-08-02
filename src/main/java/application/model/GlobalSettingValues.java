@@ -8,7 +8,7 @@ public class GlobalSettingValues {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     //многопользовательский режим
     @Column(name = "multiuser_mode", nullable = false)

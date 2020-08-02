@@ -10,7 +10,7 @@ public class PostComment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     //комментарий, на который оставлен этот комментарий (может быть NULL,
     //если комментарий оставлен просто к посту
@@ -29,7 +29,7 @@ public class PostComment {
     private User user;
 
     //дата и время комментария
-    @Column(columnDefinition = "DATETIME", nullable = false)
+    @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDate time;
 
     //текст комментария

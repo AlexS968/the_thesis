@@ -11,15 +11,15 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     //является ли пользователь модератором
     // (может ли править глобальные настройки сайта и модерировать посты)
-    @Column(name = "is_moderator", columnDefinition = "TINYINT", nullable = false)
-    private int isModerator;
+    @Column(name = "is_moderator", columnDefinition = "BOOLEAN", nullable = false)
+    private boolean isModerator;
 
     //дата и время регистрации пользователя
-    @Column(name = "reg_time", columnDefinition = "DATETIME", nullable = false)
+    @Column(name = "reg_time", columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDate regTime;
 
     //имя пользователя

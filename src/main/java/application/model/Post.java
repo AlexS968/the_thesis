@@ -1,6 +1,9 @@
 package application.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -14,15 +17,15 @@ public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
-    //скрыта или активна публикация: 0 или 1
-    @Column(name = "is_active", columnDefinition = "TINYINT", nullable = false)
-    private int isActive;
+    //скрыта или активна публикация
+    @Column(name = "is_active", columnDefinition = "BOOLEAN", nullable = false)
+    private boolean isActive;
 
-    //статус модерацииб по умолчанию значение "NEW"
+    //статус модерации, по умолчанию значение "NEW"
     @Enumerated(EnumType.STRING)
-    @Column(name = "moderation_status", columnDefinition = "enum('NEW','ACCEPTED','DECLINED') default 'NEW'")
+    @Column(name = "moderation_status",length = 8, columnDefinition = "default 'NEW'",nullable = false)
     @JsonProperty(value = "moderation_status")
     private ModerationStatus moderationStatus;
 
@@ -38,7 +41,7 @@ public class Post {
     private User user;
 
     //дата и время публикации поста
-    @Column(columnDefinition = "DATETIME", nullable = false)
+    @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDate time;
 
     //заголовок поста
@@ -55,13 +58,33 @@ public class Post {
     @Column(name = "view_count", nullable = false)
     private int viewCount;
 
-    @OneToMany(mappedBy = "post")
-    private Set<PostVote> postVotes;
+    //коллекция лайков
+    @OneToMany
+    @JoinColumn(name = "post_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @Where(clause = "value = true")
+    @LazyCollection(LazyCollectionOption.EXTRA)
+    private Set<PostVote> likeVotes;
 
+    //коллекция дизлайков
+    @OneToMany
+    @JoinColumn(name = "post_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @Where(clause = "value = false")
+    @LazyCollection(LazyCollectionOption.EXTRA)
+    private Set<PostVote> dislikeVotes;
+
+    //коллекция тэгов
     @OneToMany(mappedBy = "post")
     private Set<TagToPost> tagToPosts;
 
+    //коллекция комментариев
     @OneToMany(mappedBy = "post")
     private Set<PostComment> postComments;
 
+    public long getLikes() {
+        return likeVotes.size();
+    }
+
+    public long dislikeVotes() {
+        return dislikeVotes.size();
+    }
 }

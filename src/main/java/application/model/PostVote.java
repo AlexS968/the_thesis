@@ -9,7 +9,7 @@ public class PostVote {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     //тот, кто поставил лайк/дизлайк
     @ManyToOne(fetch = FetchType.LAZY)
@@ -22,10 +22,10 @@ public class PostVote {
     private Post post;
 
     //дата и время лайка/дизлайка
-    @Column(columnDefinition = "DATETIME", nullable = false)
+    @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDate time;
 
-    //лайк или дизлайк: 1 или -1
-    @Column(name = "value", columnDefinition = "TINYINT", nullable = false)
-    private int value;
+    //лайк или дизлайк: true или false
+    @Column(name = "value", columnDefinition = "BOOLEAN", nullable = false)
+    private boolean value;
 }
