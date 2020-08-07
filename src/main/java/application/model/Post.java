@@ -8,7 +8,7 @@ import org.hibernate.annotations.Where;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -42,7 +42,7 @@ public class Post {
 
     //дата и время публикации поста
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
-    private LocalDate time;
+    private LocalDateTime time;
 
     //заголовок поста
     @NotBlank
@@ -86,5 +86,101 @@ public class Post {
 
     public long dislikeVotes() {
         return dislikeVotes.size();
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public ModerationStatus getModerationStatus() {
+        return moderationStatus;
+    }
+
+    public void setModerationStatus(ModerationStatus moderationStatus) {
+        this.moderationStatus = moderationStatus;
+    }
+
+    public User getModerator() {
+        return moderator;
+    }
+
+    public void setModerator(User moderator) {
+        this.moderator = moderator;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public LocalDateTime getTime() {
+        return time;
+    }
+
+    public void setTime(LocalDateTime time) {
+        this.time = time;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public int getViewCount() {
+        return viewCount;
+    }
+
+    public void setViewCount(int viewCount) {
+        this.viewCount = viewCount;
+    }
+
+    public Set<TagToPost> getTagToPosts() {
+        return tagToPosts;
+    }
+
+    public void setTagToPosts(Set<TagToPost> tagToPosts) {
+        this.tagToPosts = tagToPosts;
+    }
+
+    public Set<PostComment> getPostComments() {
+        return postComments;
+    }
+
+    public void setPostComments(Set<PostComment> postComments) {
+        this.postComments = postComments;
+    }
+
+    @Override
+    public String toString() {
+        return "Post{" +
+                "id=" + id +
+                ", time=" + time +
+                '}';
     }
 }
