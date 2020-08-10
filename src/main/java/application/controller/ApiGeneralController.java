@@ -1,15 +1,15 @@
 package application.controller;
 
-import application.dto.response.*;
+import application.api.response.*;
 import application.mapper.CalendarMapper;
 import application.mapper.GlobalSettingMapper;
 import application.mapper.StatisticsMapper;
 import application.mapper.TagMapper;
-import application.service.impl.CalendarServiceImpl;
-import application.service.impl.InitServiceImpl;
-import application.service.impl.StatisticsServiceImpl;
-import application.service.TagService;
-import application.service.impl.GlobalSettingServiceImpl;
+import application.service.CalendarServiceImpl;
+import application.service.GlobalSettingServiceImpl;
+import application.service.InitServiceImpl;
+import application.service.StatisticsServiceImpl;
+import application.service.interfaces.TagService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -65,8 +65,10 @@ public class ApiGeneralController {
     @GetMapping(value = "api/calendar")
     public ResponseEntity<CalendarResponse> calendar(
             @RequestParam(required = false) int year) {
-        return new ResponseEntity<>
-                (calendarMapper.convertToDto(calendarService.postsByDay()), HttpStatus.OK);
+        return new ResponseEntity<>(calendarMapper
+                .convertToDto(calendarService.postsByDayPerYear(year),
+                        calendarService.timeOfEarliestPost()),
+                HttpStatus.OK);
     }
 
     @GetMapping(value = "api/statistics/all")

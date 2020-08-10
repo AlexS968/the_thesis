@@ -11,10 +11,10 @@ public class TagToPost {
     private long id;
 
     @ManyToOne
-    @JoinColumn(name = "post_id",nullable = false)
+    @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
     @ManyToOne
-    @JoinColumn(name = "tag_id",nullable = false)
+    @JoinColumn(name = "tag_id", nullable = false)
     private Tag tag;
 }

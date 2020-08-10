@@ -2,7 +2,7 @@ package application.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -20,11 +20,11 @@ public class User {
 
     //дата и время регистрации пользователя
     @Column(name = "reg_time", columnDefinition = "TIMESTAMP", nullable = false)
-    private LocalDate regTime;
+    private LocalDateTime regTime;
 
     //имя пользователя
     @NotBlank
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     //e-mail пользователя
@@ -72,11 +72,11 @@ public class User {
         isModerator = moderator;
     }
 
-    public LocalDate getRegTime() {
+    public LocalDateTime getRegTime() {
         return regTime;
     }
 
-    public void setRegTime(LocalDate regTime) {
+    public void setRegTime(LocalDateTime regTime) {
         this.regTime = regTime;
     }
 
@@ -99,6 +99,7 @@ public class User {
     public String getPassword() {
         return password;
     }
+
 
     public void setPassword(String password) {
         this.password = password;

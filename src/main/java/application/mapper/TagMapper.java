@@ -1,9 +1,9 @@
 package application.mapper;
 
-import application.dto.response.TagResponse;
+import application.api.response.TagResponse;
 import application.model.Tag;
 import application.repository.IPostCount;
-import application.service.impl.TagServiceImpl;
+import application.service.TagServiceImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

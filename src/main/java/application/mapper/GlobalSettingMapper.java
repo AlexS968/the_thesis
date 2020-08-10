@@ -1,6 +1,6 @@
 package application.mapper;
 
-import application.dto.response.GlobalSettingResponse;
+import application.api.response.GlobalSettingResponse;
 import application.model.GlobalSetting;
 import org.springframework.stereotype.Service;
 

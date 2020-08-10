@@ -25,7 +25,7 @@ public class Post {
 
     //статус модерации, по умолчанию значение "NEW"
     @Enumerated(EnumType.STRING)
-    @Column(name = "moderation_status",length = 8, columnDefinition = "default 'NEW'",nullable = false)
+    @Column(name = "moderation_status", length = 8, columnDefinition = "default 'NEW'", nullable = false)
     @JsonProperty(value = "moderation_status")
     private ModerationStatus moderationStatus;
 

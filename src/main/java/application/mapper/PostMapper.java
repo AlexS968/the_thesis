@@ -1,6 +1,6 @@
 package application.mapper;
 
-import application.dto.response.*;
+import application.api.response.*;
 import application.model.Post;
 import application.model.PostComment;
 import org.springframework.stereotype.Service;

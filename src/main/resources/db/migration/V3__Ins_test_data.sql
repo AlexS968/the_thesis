@@ -4,7 +4,7 @@ INSERT INTO users (is_moderator, reg_time, name, email, password)
 VALUES (true,TIMESTAMP '2019-06-04 01:00:00','Vasiliy Petrov','petrov@mail.ru','222222');
 
 INSERT INTO posts (is_active, moderation_status, moderator_id, text, time, title, user_id, view_count)
-VALUES (true, 'ACCEPTED', 2, 'test01', TIMESTAMP '2020-08-02 10:23:54', 'title01', 1, 2);
+VALUES (true, 'ACCEPTED', 2, 'test01', TIMESTAMP '2019-10-02 10:23:54', 'title01', 1, 2);
 INSERT INTO posts (is_active, moderation_status, moderator_id, text, time, title, user_id, view_count)
 VALUES (true, 'ACCEPTED', 2, 'test02', TIMESTAMP '2020-08-02 10:23:54', 'testWord02', 2, 5);
 INSERT INTO posts (is_active, moderation_status, moderator_id, text, time, title, user_id, view_count)

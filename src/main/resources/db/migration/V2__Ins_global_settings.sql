@@ -1,4 +1,4 @@
-insert into global_settings (code, name, value) values ('MULTIUSER_MODE', '', 'No');
+insert into global_settings (code, name, value) values ('MULTIUSER_MODE', '', 'Yes');
 insert into global_settings (code, name, value) values ('POST_PREMODERATION', '', 'Yes');
 insert into global_settings (code, name, value) values ('STATISTICS_IS_PUBLIC', '', 'Yes');
 

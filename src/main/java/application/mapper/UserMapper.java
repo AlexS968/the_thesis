@@ -1,7 +1,7 @@
 package application.mapper;
 
-import application.dto.response.LoginResponse;
-import application.dto.response.UserByLoginResponse;
+import application.api.response.LoginResponse;
+import application.api.response.UserByLoginResponse;
 import application.model.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

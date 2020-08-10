@@ -1,11 +1,11 @@
 package application.controller;
 
-import application.dto.response.PostByIdResponse;
-import application.dto.response.PostsListResponse;
+import application.api.response.PostByIdResponse;
+import application.api.response.PostsListResponse;
 import application.mapper.PostMapper;
-import application.service.impl.PostCommentServiceImpl;
-import application.service.impl.PostServiceImpl;
-import application.service.impl.TagServiceImpl;
+import application.service.PostCommentServiceImpl;
+import application.service.PostServiceImpl;
+import application.service.TagServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -56,10 +56,10 @@ public class ApiPostController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<PostByIdResponse> PostByID(@PathVariable long id){
+    public ResponseEntity<PostByIdResponse> PostByID(@PathVariable long id) {
         System.out.println(id);
         return new ResponseEntity<>(postMapper.convertToDto(postService.getPostByID(id),
-                tagService.getTagsToPost(id),postCommentService.getTagsToPost(id)),
+                tagService.getTagsToPost(id), postCommentService.getTagsToPost(id)),
                 HttpStatus.OK);
     }
 }

@@ -8,5 +8,6 @@ public class Main {
 
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
+        //SpringApplication.run(new Class[]{Main.class, WebSecurityConfig.class}, args);
     }
 }
