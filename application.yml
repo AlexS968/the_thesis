@@ -10,3 +10,9 @@ appEmail:
   password: Sjeu#94Tn1Uaq83z
 
 captchaExpirationTime: 1
+
+spring.servlet.multipart.max-file-size: 128KB
+spring.servlet.multipart.max-request-size: 128KB
+spring.servlet.multipart.enabled: true
+upload.path: /Users/alex/the_thesis/upload
+

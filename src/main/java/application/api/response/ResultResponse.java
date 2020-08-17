@@ -1,10 +1,10 @@
 package application.api.response;
 
-public class PasswordRestoreResponse {
+public class ResultResponse {
 
-    private boolean result;
+    boolean result;
 
-    public PasswordRestoreResponse(boolean result) {
+    public ResultResponse(boolean result) {
         this.result = result;
     }
 

@@ -20,4 +20,8 @@ public class StatisticsServiceImpl implements StatisticsService {
     public List<Post> getAllPostsOrderByTimeAsc() {
         return new ArrayList<>(postRepository.findAllOrderByTimeAsc());
     }
+
+    public List<Post> getAllPostsByUserIdOrderByTimeAsc(long userId) {
+        return new ArrayList<>(postRepository.findAllByUserIdOrderByTimeAsc(userId));
+    }
 }

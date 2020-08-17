@@ -1,7 +1,6 @@
 package application.mapper;
 
-import application.api.response.LoginResponse;
-import application.api.response.UserByLoginResponse;
+import application.api.response.AuthenticationResponse;
 import application.model.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
@@ -15,16 +14,15 @@ public class UserMapper {
         return new ModelMapper();
     }
 
-    public LoginResponse convertToDto(User user) {
-        LoginResponse response = new LoginResponse();
-        UserByLoginResponse userResponse = new UserByLoginResponse();
-        if (user != null) {
-            modelMapper().map(user, userResponse);
-            response.setResult(true);
-            response.setUser(userResponse);
-        } else {
-            response.setResult(false);
-        }
+    public AuthenticationResponse convertToDto(User user, int moderationCount) {
+        AuthenticationResponse response = new AuthenticationResponse();
+        response.setResult(true);
+        response.setUser();
+        modelMapper().map(user, response);
+        response.setUserModeration(user.isModerator());
+        //****************** не понятно, что такое settings здесь???? ************
+        response.setUserSettings(false);
+        response.setUserModerationCount(moderationCount);
         return response;
     }
 }

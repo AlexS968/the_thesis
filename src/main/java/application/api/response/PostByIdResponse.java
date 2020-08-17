@@ -5,7 +5,7 @@ public class PostByIdResponse {
     private long id;
     private long timestamp;
     private boolean active;
-    private UserResponse user;
+    private PostResponse.UserPostResponse user;
     private String title;
     //Текст поста в формате HTML
     private String text;
@@ -39,12 +39,20 @@ public class PostByIdResponse {
         this.active = active;
     }
 
-    public UserResponse getUser() {
+    public PostResponse.UserPostResponse getUser() {
         return user;
     }
 
-    public void setUser(UserResponse user) {
-        this.user = user;
+    public void setUser() {
+        this.user = new PostResponse.UserPostResponse();
+    }
+
+    public void setUserId(long id){
+        this.user.setId(id);
+    }
+
+    public void setUserName(String name){
+        this.user.setName(name);
     }
 
     public String getTitle() {

@@ -24,7 +24,6 @@ public class CaptchaServiceImpl implements CaptchaService {
     }
 
     public CaptchaCode captchaGenerator() {
-
         //generate secret_code
         String passSymbols = "abcdefghijklmnopqrstuvwxyz0123456789";
         Random rnd = new Random();
@@ -35,7 +34,7 @@ public class CaptchaServiceImpl implements CaptchaService {
         //create captcha
         CaptchaCode captcha = new CaptchaCode(
                 LocalDateTime.now(),
-                new YCage().getTokenGenerator().next(), //generate code
+                new YCage().getTokenGenerator().next().substring(0,4), //generate code
                 randomString.toString());
 
         captchaCodeRepository.save(captcha);

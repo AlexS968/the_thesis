@@ -6,12 +6,12 @@ public class PostCommentResponse {
     private long timestamp;
     //Текст поста в формате HTML
     private String text;
-    private UserWithPhotoResponse user;
+    private UserPostCommentResponse user;
 
     public PostCommentResponse() {
     }
 
-    public PostCommentResponse(long id, long timestamp, String text, UserWithPhotoResponse user) {
+    public PostCommentResponse(long id, long timestamp, String text, UserPostCommentResponse user) {
         this.id = id;
         this.timestamp = timestamp;
         this.text = text;
@@ -42,11 +42,52 @@ public class PostCommentResponse {
         this.text = text;
     }
 
-    public UserWithPhotoResponse getUser() {
+    public UserPostCommentResponse getUser() {
         return user;
     }
 
-    public void setUser(UserWithPhotoResponse user) {
+    public void setUser(UserPostCommentResponse user) {
         this.user = user;
+    }
+
+    public static class UserPostCommentResponse {
+
+
+        private long id;
+        private String name;
+        private String photo;
+
+        public UserPostCommentResponse() {
+        }
+
+        public UserPostCommentResponse(long id, String name, String photo) {
+            this.id = id;
+            this.name = name;
+            this.photo = photo;
+        }
+
+        public long getId() {
+            return id;
+        }
+
+        public void setId(long id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getPhoto() {
+            return photo;
+        }
+
+        public void setPhoto(String photo) {
+            this.photo = photo;
+        }
     }
 }

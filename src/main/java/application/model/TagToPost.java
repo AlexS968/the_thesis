@@ -17,4 +17,12 @@ public class TagToPost {
     @ManyToOne
     @JoinColumn(name = "tag_id", nullable = false)
     private Tag tag;
+
+    public TagToPost() {
+    }
+
+    public TagToPost(Post post, Tag tag) {
+        this.post = post;
+        this.tag = tag;
+    }
 }

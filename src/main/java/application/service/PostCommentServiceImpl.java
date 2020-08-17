@@ -19,4 +19,13 @@ public class PostCommentServiceImpl implements PostCommentService {
     public List<PostComment> getTagsToPost(long id) {
         return postCommentRepository.findAllByPost(id);
     }
+
+    public PostComment getCommentById(long id) {
+        return postCommentRepository.findById(id).isPresent() ?
+                postCommentRepository.findById(id).get() : null;
+    }
+
+    public long addPostComment(PostComment comment) {
+        return postCommentRepository.save(comment).getId();
+    }
 }

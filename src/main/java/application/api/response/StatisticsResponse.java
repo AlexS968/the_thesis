@@ -1,6 +1,6 @@
 package application.api.response;
 
-public class AllStatisticsResponse {
+public class StatisticsResponse {
 
     private int postsCount;
     private long likesCount;

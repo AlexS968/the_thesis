@@ -2,9 +2,10 @@ package application.service.interfaces;
 
 public interface RegisterService {
 
-    boolean checkEmail(String email);
+    void checkAndCreateUser(String email, String name, String code,
+                            String secretCode, String password);
 
-    boolean checkName(String name);
+    //boolean checkName(String name);
 
     boolean checkCaptcha(String code, String secretCode);
 }

@@ -56,6 +56,17 @@ public class User {
     @OneToMany(mappedBy = "user")
     private Set<PostComment> postComments;
 
+    public User() {
+    }
+
+    public User(@NotBlank String name, @NotBlank String email, @NotBlank String password, LocalDateTime regTime, boolean isModerator) {
+        this.isModerator = isModerator;
+        this.regTime = regTime;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
+
     public long getId() {
         return id;
     }
@@ -151,5 +162,13 @@ public class User {
 
     public void setPostComments(Set<PostComment> postComments) {
         this.postComments = postComments;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

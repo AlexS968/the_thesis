@@ -1,5 +1,7 @@
 package application.service;
 
+import application.exception.ApiValidationException;
+import application.exception.EntityNotFoundException;
 import application.model.User;
 import application.repository.UserRepository;
 import application.service.interfaces.LoginService;
@@ -11,8 +13,8 @@ import java.util.Map;
 @Service
 public class LoginServiceImpl implements LoginService {
 
-    //мапа с идентификаторами сессий
-    private final Map<String, Long> sessionsId = new HashMap<>();
+    //sessions id
+    private static final Map<String, Long> sessionsId = new HashMap<>();
 
     private final UserRepository userRepository;
 
@@ -20,16 +22,22 @@ public class LoginServiceImpl implements LoginService {
         this.userRepository = userRepository;
     }
 
-    //проверить/добавить логику в случае модератора
     public User userAuthentication(String email, String password, String sessionId) {
-        User user = userRepository.findByEmail(email).orElse(null);
-        if (user != null) {
-            if (user.getPassword().equals(password)) {
-                sessionsId.put(sessionId, user.getId());
-            } else {
-                user = null;
-            }
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ApiValidationException(""));
+        if (user.getPassword().equals(password)) {
+            sessionsId.put(sessionId, user.getId());
+        } else {
+            throw new ApiValidationException("");
         }
         return user;
+    }
+
+    public void logout(String sessionId) {
+        sessionsId.remove(sessionId);
+    }
+
+    public static Map<String, Long> getSessionsId() {
+        return sessionsId;
     }
 }

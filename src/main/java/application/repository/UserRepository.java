@@ -10,11 +10,12 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    User findByName(String username);
+    Optional<User> findByName(String username);
 
-    User findByCode(String code);
+    Optional<User> findByCode(String code);
 
-    @Query
+    Optional<User> findById(long id);
+
     Optional<User> findByEmail(String email);
 
     @Query(value = "UPDATE users SET code = ?1 WHERE id = ?2", nativeQuery = true)

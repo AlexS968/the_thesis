@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface GlobalSettingRepository
         extends CrudRepository<GlobalSetting, Long> {
+
+    GlobalSetting findByCode(String code);
 }

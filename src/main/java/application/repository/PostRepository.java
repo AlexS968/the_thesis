@@ -25,6 +25,27 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findAllByIsActiveAndModerationStatusAndTimeLessThanEqualAndOrderByTimeDes
             (boolean isActive, String moderationStatus, Timestamp time);
 
+    @Query(value = "SELECT * " +
+            "FROM posts " +
+            "WHERE is_active = ?1 AND moderation_status = ?2 AND user_id = ?3 " +
+            "ORDER BY time DESC", nativeQuery = true)
+    List<Post> findAllByIsActiveAndModerationStatusAndUserIdAndOrderByTimeDes
+            (boolean isActive, String moderationStatus, long userId);
+
+    @Query(value = "SELECT * " +
+            "FROM posts " +
+            "WHERE is_active = ?1 AND moderation_status = 'NEW' " +
+            "ORDER BY time DESC", nativeQuery = true)
+    List<Post> findAllByIsActiveAndModerationStatusNew
+            (boolean isActive);
+
+    @Query(value = "SELECT * " +
+            "FROM posts " +
+            "WHERE is_active = ?1 AND moderator_id = ?2 AND moderation_status = ?3 " +
+            "ORDER BY time DESC", nativeQuery = true)
+    List<Post> findAllByIsActiveAndModeratorIdAndModerationStatusAndOrderByTimeDes
+            (boolean isActive, long moderatorId, String moderationStatus);
+
     @Query(value = "SELECT *, " +
             "(SELECT COUNT(*) AS comments_number FROM post_comments WHERE post_comments.post_id = posts.id) " +
             "FROM posts " +
@@ -43,9 +64,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query(value = "SELECT * " +
             "FROM posts " +
-            "WHERE is_active = ?1 AND moderation_status = ?2 AND time <= ?3 AND title ILIKE ?4 " +
+            "WHERE is_active = ?1 AND moderation_status = ?2 AND time <= ?3 AND (title ILIKE ?4 OR text ILIKE ?4) " +
             "ORDER BY time DESC", nativeQuery = true)
-    List<Post> findAllByIsActiveAndModerationStatusAndTimeLessThanEqualAndTitleContainingAndOrderByTimeDes
+    List<Post> findAllByQuery
             (boolean isActive, String moderationStatus, Timestamp time, String query);
 
     @Query(value = "SELECT p.* FROM posts As p, tag2post AS t2p, tags As t " +
@@ -79,4 +100,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query(value = "SELECT * FROM posts ORDER BY time ASC", nativeQuery = true)
     List<Post> findAllOrderByTimeAsc();
+
+    @Query(value = "SELECT * FROM posts WHERE user_id = ?1 ORDER BY time ASC", nativeQuery = true)
+    List<Post> findAllByUserIdOrderByTimeAsc(long userId);
 }

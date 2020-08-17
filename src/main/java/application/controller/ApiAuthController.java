@@ -5,14 +5,13 @@ import application.api.request.LoginRequest;
 import application.api.request.PasswordRestoreRequest;
 import application.api.request.RegisterRequest;
 import application.api.response.*;
+import application.exception.ApiValidationException;
+import application.exception.EntityNotFoundException;
+import application.exception.apierror.ApiValidationError;
 import application.mapper.CaptchaMapper;
-import application.mapper.ChangePasswordMapper;
-import application.mapper.RegisterMapper;
 import application.mapper.UserMapper;
-import application.service.AuthCheckServiceImpl;
-import application.service.CaptchaServiceImpl;
-import application.service.LoginServiceImpl;
-import application.service.UserServiceImpl;
+import application.model.User;
+import application.service.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,62 +23,84 @@ import javax.validation.Valid;
 @RequestMapping(value = "/api/auth")
 public class ApiAuthController {
 
-    private final AuthCheckServiceImpl authCheckService;
     private final UserServiceImpl userService;
     private final UserMapper userMapper;
     private final LoginServiceImpl loginService;
     private final CaptchaServiceImpl captchaService;
     private final CaptchaMapper captchaMapper;
-    private final RegisterMapper registerMapper;
-    private final ChangePasswordMapper changePasswordMapper;
+    private final RegisterServiceImpl registerService;
+    private final PasswordServiceImpl passwordService;
+    private final PostServiceImpl postService;
 
-    public ApiAuthController(AuthCheckServiceImpl authCheckService, UserServiceImpl userService, UserMapper userMapper, LoginServiceImpl loginService, CaptchaServiceImpl captchaService, CaptchaMapper captchaMapper, RegisterMapper registerMapper, ChangePasswordMapper changePasswordMapper) {
-        this.authCheckService = authCheckService;
+    public ApiAuthController(UserServiceImpl userService, UserMapper userMapper, LoginServiceImpl loginService, CaptchaServiceImpl captchaService, CaptchaMapper captchaMapper, RegisterServiceImpl registerService, PasswordServiceImpl passwordService, PostServiceImpl postService) {
         this.userService = userService;
         this.userMapper = userMapper;
         this.loginService = loginService;
         this.captchaService = captchaService;
         this.captchaMapper = captchaMapper;
-        this.registerMapper = registerMapper;
-        this.changePasswordMapper = changePasswordMapper;
+        this.registerService = registerService;
+        this.passwordService = passwordService;
+        this.postService = postService;
     }
 
     @GetMapping(value = "/check")
-    public ResponseEntity<AuthCheckResponse> authCheck() {
-        return authCheckService.getAuthCheck();
+    public ResponseEntity<AuthenticationResponse> authCheck(HttpSession session) {
+        Long userId = LoginServiceImpl.getSessionsId().get(session.getId());
+        if (userId == null) {
+            throw new ApiValidationException(new ApiValidationError(), "");
+        }
+        User user = userService.findUserById(userId)
+                .orElseThrow(EntityNotFoundException::new);
+
+        int moderationCount = !user.isModerator() ?
+                0 : postService.getPostsForModeration(user, "new").size();
+        return new ResponseEntity<>(userMapper.convertToDto(user, moderationCount),
+                HttpStatus.OK);
     }
 
     @GetMapping(value = "/captcha")
-    public ResponseEntity<CaptchaResponse> captcha() {
+    public ResponseEntity<CaptchaResponse> captcha() throws Exception {
         return new ResponseEntity<>(captchaMapper.convertToDto(
                 captchaService.captchaGenerator()), HttpStatus.OK);
     }
 
     @PostMapping("/restore")
-    public ResponseEntity<PasswordRestoreResponse> restorePassword(
+    public ResponseEntity<ResultResponse> restorePassword(
             @Valid @RequestBody PasswordRestoreRequest request) {
-        return new ResponseEntity<>(new PasswordRestoreResponse(
-                userService.checkUserByEmail(request.getEmail())), HttpStatus.OK);
+        userService.restorePassword(request.getEmail());
+        return new ResponseEntity<>(new ResultResponse(true), HttpStatus.OK);
     }
 
     @PostMapping("/password")
-    public ResponseEntity<ChangePasswordResponse> changePassword(
+    public ResponseEntity<ResultResponse> changePassword(
             @Valid @RequestBody ChangePasswordRequest request) {
-        return new ResponseEntity<>(changePasswordMapper.convertToDto(request),
-                HttpStatus.OK);
+        passwordService.changePassword(request);
+        return new ResponseEntity<>(new ResultResponse(true), HttpStatus.OK);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> register(
+    public ResponseEntity<ResultResponse> register(
             @Valid @RequestBody RegisterRequest request) {
-        return new ResponseEntity<>(registerMapper.convertToDto(request), HttpStatus.OK);
+        registerService.checkAndCreateUser(request.getEmail(),
+                request.getName(), request.getCaptcha(), request.getCaptchaSecret(),
+                request.getPassword());
+        return new ResponseEntity<>(new ResultResponse(true), HttpStatus.OK);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(
+    public ResponseEntity<AuthenticationResponse> login(
             @Valid @RequestBody LoginRequest request, HttpSession session) {
-        return new ResponseEntity<>(userMapper.convertToDto(
-                loginService.userAuthentication(request.getEmail(),
-                        request.getPassword(), session.getId())), HttpStatus.OK);
+        User user = loginService.userAuthentication(request.getEmail(),
+                request.getPassword(), session.getId());
+        int moderationCount = !user.isModerator() ?
+                0 : postService.getPostsForModeration(user, "new").size();
+        return new ResponseEntity<>(userMapper.convertToDto(user, moderationCount),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<ResultResponse> logout(HttpSession session) {
+        loginService.logout(session.getId());
+        return new ResponseEntity<>(new ResultResponse(true), HttpStatus.OK);
     }
 }

@@ -1,5 +1,6 @@
 package application.mapper;
 
+import application.api.request.GlobalSettingRequest;
 import application.api.response.GlobalSettingResponse;
 import application.model.GlobalSetting;
 import org.springframework.stereotype.Service;
@@ -10,19 +11,14 @@ import java.util.Set;
 @Service
 public class GlobalSettingMapper {
 
-/*    @Bean
-    public ModelMapper modelMapper() {
-        return new ModelMapper();
-    }*/
-
-    public Set<GlobalSetting> convertToEntity(GlobalSettingResponse globalSettingResponse) {
+    public Set<GlobalSetting> convertToEntity(GlobalSettingRequest request) {
         Set<GlobalSetting> globalSettings = new HashSet<>();
         globalSettings.add(new GlobalSetting("MULTIUSER_MODE", "",
-                globalSettingResponse.isMultiuserMode() ? "Yes" : "No"));
+                request.isMultiuserMode() ? "Yes" : "No"));
         globalSettings.add(new GlobalSetting("POST_PREMODERATION", "",
-                globalSettingResponse.isMultiuserMode() ? "Yes" : "No"));
+                request.isPostPremoderation() ? "Yes" : "No"));
         globalSettings.add(new GlobalSetting("STATISTICS_IS_PUBLIC", "",
-                globalSettingResponse.isMultiuserMode() ? "Yes" : "No"));
+                request.isStatisticsIsPublic() ? "Yes" : "No"));
         return globalSettings;
     }
 

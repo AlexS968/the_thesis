@@ -73,7 +73,7 @@ public class Post {
     private Set<PostVote> dislikeVotes;
 
     //коллекция тэгов
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
     private Set<TagToPost> tagToPosts;
 
     //коллекция комментариев
@@ -180,7 +180,10 @@ public class Post {
     public String toString() {
         return "Post{" +
                 "id=" + id +
-                ", time=" + time +
+                ", user=" + user +
+                ", title='" + title + '\'' +
+                ", text='" + text + '\'' +
+                ", tagToPosts=" + tagToPosts +
                 '}';
     }
 }

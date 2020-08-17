@@ -24,9 +24,7 @@ INSERT INTO tag2post (post_id, tag_id) VALUES (2, 2);
 INSERT INTO post_votes (user_id, post_id, time, value) VALUES (2, 1, TIMESTAMP '2020-08-04 10:23:54', true);
 INSERT INTO post_votes (user_id, post_id, time, value) VALUES (2, 4, TIMESTAMP '2020-08-04 10:23:54', true);
 INSERT INTO post_votes (user_id, post_id, time, value) VALUES (1, 4, TIMESTAMP '2020-08-04 10:23:54', true);
-INSERT INTO post_votes (user_id, post_id, time, value) VALUES (1, 2, TIMESTAMP '2020-08-04 10:23:54', true);
 INSERT INTO post_votes (user_id, post_id, time, value) VALUES (1, 2, TIMESTAMP '2020-08-04 10:23:54', false);
-INSERT INTO post_votes (user_id, post_id, time, value) VALUES (2, 4, TIMESTAMP '2020-08-04 10:23:54', true);
 INSERT INTO post_votes (user_id, post_id, time, value) VALUES (2, 3, TIMESTAMP '2020-08-04 10:23:54', true);
 
 INSERT INTO post_comments (user_id, post_id, time, text) VALUES (2, 1, TIMESTAMP '2020-08-04 10:23:54', 'super01');

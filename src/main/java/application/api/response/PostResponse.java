@@ -4,7 +4,7 @@ public class PostResponse {
 
     private long id;
     private long timestamp;
-    private UserResponse user;
+    private UserPostResponse user;
     private String title;
     private String announce;
     private long likeCount;
@@ -28,12 +28,20 @@ public class PostResponse {
         this.timestamp = timestamp;
     }
 
-    public UserResponse getUser() {
+    public UserPostResponse getUser() {
         return user;
     }
 
-    public void setUser(UserResponse user) {
-        this.user = user;
+    public void setUser() {
+        this.user = new UserPostResponse();
+    }
+
+    public void setUserId(long id){
+        this.user.setId(id);
+    }
+
+    public void setUserName(String name){
+        this.user.setName(name);
     }
 
     public String getTitle() {
@@ -83,4 +91,35 @@ public class PostResponse {
     public void setViewCount(int viewCount) {
         this.viewCount = viewCount;
     }
+
+    static class UserPostResponse {
+
+        private long id;
+        private String name;
+
+        public UserPostResponse() {
+        }
+
+        public UserPostResponse(long id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        public long getId() {
+            return id;
+        }
+
+        public void setId(long id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
 }
+

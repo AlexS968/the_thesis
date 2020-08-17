@@ -37,6 +37,17 @@ public class PostComment {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String text;
 
+    public PostComment() {
+    }
+
+    public PostComment(PostComment parentPostComment, Post post, User user, LocalDateTime time, @NotBlank String text) {
+        this.parentPostComment = parentPostComment;
+        this.post = post;
+        this.user = user;
+        this.time = time;
+        this.text = text;
+    }
+
     public long getId() {
         return id;
     }

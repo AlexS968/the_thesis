@@ -1,9 +1,8 @@
 package application.mapper;
 
-import application.api.response.TagResponse;
+import application.api.response.TagsResponse;
 import application.model.Tag;
 import application.repository.IPostCount;
-import application.service.TagServiceImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,26 +10,19 @@ import java.util.List;
 @Service
 public class TagMapper {
 
-    private final TagServiceImpl tagService;
-
-    public TagMapper(TagServiceImpl tagService) {
-        this.tagService = tagService;
-    }
-
-    public TagResponse[] convertToDto(List<Tag> tags) {
-        List<IPostCount> weights = tagService.getWeights();
+    public TagsResponse convertToDto(List<Tag> tags, List<IPostCount> weights) {
         Integer max = weights.stream().map(IPostCount::getTotal).reduce(Integer::max).orElse(null);
-        TagResponse[] responses = new TagResponse[tags.size()];
+        TagsResponse.TagResponse[] res = new TagsResponse.TagResponse[tags.size()];
         int i = 0;
         for (Tag tag : tags) {
             for (IPostCount element : weights) {
                 if (tag.getName().equals(element.getName())) {
-                    responses[i] = new TagResponse(element.getName(),
+                    res[i] = new TagsResponse.TagResponse(element.getName(),
                             (double) element.getTotal() / (double) max);
-                    i++;
                 }
             }
+            i++;
         }
-        return responses;
+        return new TagsResponse(res);
     }
 }
