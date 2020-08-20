@@ -126,6 +126,7 @@ public class ApiPostController {
             @Valid @RequestBody LikeRequest request, HttpSession session) {
         User user = userService.findUserById(LoginServiceImpl.getSessionsId()
                 .get(session.getId())).orElseThrow(EntityNotFoundException::new);
+
         return new ResponseEntity<>(new ResultResponse(postVoteService
                 .like(postService.getPostByID(request.getPostId()), user, true)),
                 HttpStatus.OK);

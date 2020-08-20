@@ -8,7 +8,7 @@ public interface UserService {
 
     User findUserByCode(String code);
 
-    Optional<User> findUserById(long id);
+    Optional<User> findUserById(Long id);
 
     void restorePassword(String email);
 

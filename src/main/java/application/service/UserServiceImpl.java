@@ -29,7 +29,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> findUserById(long id) {
+    public Optional<User> findUserById(Long id) {
+        if (id==null){
+            throw new EntityNotFoundException("User is not authenticated");
+        }
         return userRepository.findById(id);
     }
 

@@ -6,6 +6,8 @@ import application.exception.ApiValidationException;
 import application.exception.apierror.ApiValidationError;
 import application.model.*;
 import application.service.TagServiceImpl;
+import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -26,17 +28,13 @@ public class PostMapper {
     }
 
     public PostsListResponse convertToDto(int offset, int limit, List<Post> posts, int moderationCounter) {
-        PostsListResponse postsListResponse;
         if (posts != null) {
-            postsListResponse = new PostsListResponse(moderationCounter,
-                    posts.subList(offset, Math.min(offset + limit,
-                            posts.size())).stream()
-                            .map(this::convertToDto)
-                            .toArray(PostResponse[]::new));
+            return new PostsListResponse(moderationCounter,
+                    posts.subList(offset, Math.min(offset + limit, posts.size())).stream()
+                            .map(this::convertToDto).toArray(PostResponse[]::new));
         } else {
-            postsListResponse = new PostsListResponse(0, new PostResponse[0]);
+            return new PostsListResponse(0, new PostResponse[0]);
         }
-        return postsListResponse;
     }
 
     public PostResponse convertToDto(Post post) {
@@ -69,13 +67,15 @@ public class PostMapper {
         response.setUserId(post.getUser().getId());
         response.setUserName(post.getUser().getName());
 
-        PostCommentResponse[] commentResponses = new PostCommentResponse[comments.size()];
-        for (int i = 0; i < comments.size(); i++) {
-            commentResponses[i] = new PostCommentResponse(comments.get(i).getId(),
-                    comments.get(i).getTime().toEpochSecond(ZoneOffset.ofHours(1)), comments.get(i).getText(),
-                    new PostCommentResponse.UserPostCommentResponse(post.getUser().getId(), post.getUser().getName(), post.getUser().getPhoto()));
+        if (comments != null) {
+            PostCommentResponse[] commentResponses = new PostCommentResponse[comments.size()];
+            for (int i = 0; i < comments.size(); i++) {
+                commentResponses[i] = new PostCommentResponse(comments.get(i).getId(),
+                        comments.get(i).getTime().toEpochSecond(ZoneOffset.ofHours(1)), comments.get(i).getText(),
+                        new PostCommentResponse.UserPostCommentResponse(post.getUser().getId(), post.getUser().getName(), post.getUser().getPhoto()));
+            }
+            response.setComments(commentResponses);
         }
-        response.setComments(commentResponses);
         response.setTags(tags.toArray(tags.toArray(new String[0])));
 
         return response;
@@ -84,11 +84,11 @@ public class PostMapper {
     public Post convertToEntity(PostRequest request, User user) {
         if (request.getTitle().length() < 3) {
             throw new ApiValidationException(new ApiValidationError(
-                    "Заголовок не установлен",null),"");
+                    "Заголовок не установлен", null), "");
         }
         if (request.getText().length() < 50) {
             throw new ApiValidationException(new ApiValidationError(
-                    null,"Текст публикации слишком короткий"),"");
+                    null, "Текст публикации слишком короткий"), "");
         }
 
         Post post = new Post();

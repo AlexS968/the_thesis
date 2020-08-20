@@ -14,21 +14,14 @@ import application.model.PostComment;
 import application.model.User;
 import application.service.*;
 import application.service.interfaces.TagService;
-import org.imgscalr.Scalr;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/")
@@ -47,11 +40,10 @@ public class ApiGeneralController {
     private final UserServiceImpl userService;
     private final PostCommentServiceImpl postCommentService;
     private final PostCommentMapper postCommentMapper;
+    private final RegisterServiceImpl registerService;
+    private final ImageServiceImpl imageService;
 
-    @Value("${upload.path}")
-    private String uploadPath;
-
-    public ApiGeneralController(InitServiceImpl initService, GlobalSettingServiceImpl globalSettingService, GlobalSettingMapper settingMapper, TagService tagService, TagMapper tagMapper, CalendarServiceImpl calendarService, CalendarMapper calendarMapper, StatisticsServiceImpl statisticsService, StatisticsMapper statisticsMapper, PostServiceImpl postService, UserServiceImpl userService, PostCommentServiceImpl postCommentService, PostCommentMapper postCommentMapper) {
+    public ApiGeneralController(InitServiceImpl initService, GlobalSettingServiceImpl globalSettingService, GlobalSettingMapper settingMapper, TagService tagService, TagMapper tagMapper, CalendarServiceImpl calendarService, CalendarMapper calendarMapper, StatisticsServiceImpl statisticsService, StatisticsMapper statisticsMapper, PostServiceImpl postService, UserServiceImpl userService, PostCommentServiceImpl postCommentService, PostCommentMapper postCommentMapper, RegisterServiceImpl registerService, ImageServiceImpl imageService) {
         this.initService = initService;
         this.globalSettingService = globalSettingService;
         this.settingMapper = settingMapper;
@@ -65,6 +57,8 @@ public class ApiGeneralController {
         this.userService = userService;
         this.postCommentService = postCommentService;
         this.postCommentMapper = postCommentMapper;
+        this.registerService = registerService;
+        this.imageService = imageService;
     }
 
     @GetMapping(value = "api/init")
@@ -133,60 +127,35 @@ public class ApiGeneralController {
     }
 
     @PostMapping("api/image")
-    public String imageUpload(@RequestParam("image") MultipartFile file,
-                              HttpSession session) throws IOException {
+    public ResponseEntity<String> image(@RequestParam("image") MultipartFile file,
+                                        HttpSession session) throws IOException {
         User user = userService.findUserById(LoginServiceImpl.getSessionsId()
                 .get(session.getId())).orElseThrow(EntityNotFoundException::new);
-        String pathname = null;
-        if (file != null) {
 
-
-            String path = UUID.randomUUID().toString();
-            String firstDir = path.substring(0, 7);
-            String secondDir = path.substring(9, 12);
-            String thirdDir = path.substring(14, 17);
-            File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdir();
-            }
-            uploadDir = new File(uploadPath + "/" + firstDir);
-            uploadDir.mkdir();
-            uploadDir = new File(uploadPath + "/" + firstDir + "/" + secondDir);
-            uploadDir.mkdir();
-            uploadDir = new File(uploadPath + "/" + firstDir + "/" + secondDir + "/" + thirdDir);
-            uploadDir.mkdir();
-
-
-            String resultFilename = path.substring(19) + file.getOriginalFilename();
-            pathname = uploadPath + "/" + firstDir + "/" + secondDir + "/" + thirdDir + "/" + resultFilename;
-            file.transferTo(new File(uploadPath + "/" + firstDir + "/" + secondDir + "/" + thirdDir + "/" + resultFilename));
-        }
-        return pathname;
+        return new ResponseEntity<>(imageService.uploadImage(file, user), HttpStatus.OK);
     }
 
-    @PostMapping("api/profile/my")
-    public ResponseEntity<ResultResponse> editProfile(
-            @ModelAttribute ProfileRequest request, HttpSession session) throws Exception {
+    @PostMapping(path = "api/profile/my", headers = "Content-Type=multipart/form-data")
+    public ResponseEntity<ResultResponse> profileWithPhoto(@RequestParam(name = "photo", required = false) MultipartFile file,
+                                                           @RequestParam(required = false) Integer removePhoto,
+                                                           @RequestParam(required = false) String password, @RequestParam String name,
+                                                           @RequestParam String email, HttpSession session) throws Exception {
         User user = userService.findUserById(LoginServiceImpl.getSessionsId()
                 .get(session.getId())).orElseThrow(EntityNotFoundException::new);
 
-        String pathDir = uploadPath + "/" + "Avatars";
-        File uploadDir = new File(pathDir);
-        if (!uploadDir.exists()) {
-            uploadDir.mkdir();
-        }
-        //upload image
-        MultipartFile file = request.getPhoto();
-        String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
-        File avatar = new File(pathDir + "/" + fileName);
-        file.transferTo(avatar);
-        //resize image
-        BufferedImage image = ImageIO.read(avatar);
-        BufferedImage newImage = CaptchaMapper.resizeImage(image, 36, 36);
-        ImageIO.write(newImage, "jpg", avatar);
-        //update user
-        user.setPhoto(fileName);
-        userService.saveUser(user);
+        registerService.changeProfile(file, removePhoto, password, name, email, user);
+        return new ResponseEntity<>(new ResultResponse(true), HttpStatus.OK);
+    }
+
+    @PostMapping(path = "api/profile/my", headers = "Content-Type=application/json;charset=UTF-8")
+    public ResponseEntity<ResultResponse> profileWithoutPhoto(
+            @Valid @RequestBody ProfileRequest request, HttpSession session)
+            throws Exception {
+        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
+                .get(session.getId())).orElseThrow(EntityNotFoundException::new);
+
+        registerService.changeProfile(null, request.getRemovePhoto(), request.getPassword(),
+                request.getName(), request.getEmail(), user);
         return new ResponseEntity<>(new ResultResponse(true), HttpStatus.OK);
     }
 

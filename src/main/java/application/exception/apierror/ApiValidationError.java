@@ -115,15 +115,15 @@ public class ApiValidationError {
     @Override
     public String toString() {
         return "ApiValidationError{" +
-                "title='" + title + '\'' +
-                ", text='" + text + '\'' +
-                ", image='" + image + '\'' +
-                ", code='" + code + '\'' +
-                ", password='" + password + '\'' +
-                ", captcha='" + captcha + '\'' +
-                ", email='" + email + '\'' +
-                ", name='" + name + '\'' +
-                ", photo='" + photo + '\'' +
+                (title != null ? "title='" + title + '\'' + ", " : "") +
+                (text != null ? "text='" + text + '\'' + ", " : "") +
+                (image != null ? "image='" + image + '\'' + ", " : "") +
+                (code != null ? "code='" + code + '\'' + ", " : "") +
+                (password != null ? "password='" + password + '\'' + ", " : "") +
+                (captcha != null ? "captcha='" + captcha + '\'' + ", " : "") +
+                (email != null ? "email='" + email + '\'' + ", " : "") +
+                (name != null ? "name='" + name + '\'' + ", " : "") +
+                (photo != null ? "photo='" + photo + '\'' : "") +
                 '}';
     }
 }

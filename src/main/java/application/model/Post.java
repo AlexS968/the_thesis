@@ -73,7 +73,7 @@ public class Post {
     private Set<PostVote> dislikeVotes;
 
     //коллекция тэгов
-    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private Set<TagToPost> tagToPosts;
 
     //коллекция комментариев
@@ -81,11 +81,11 @@ public class Post {
     private Set<PostComment> postComments;
 
     public long getLikes() {
-        return likeVotes.size();
+        return likeVotes == null ? 0 : likeVotes.size();
     }
 
     public long dislikeVotes() {
-        return dislikeVotes.size();
+        return dislikeVotes == null ? 0 : dislikeVotes.size();
     }
 
     public long getId() {
@@ -179,11 +179,18 @@ public class Post {
     @Override
     public String toString() {
         return "Post{" +
-                "id=" + id +
+                "isActive=" + isActive +
+                ", moderationStatus=" + moderationStatus +
+                ", moderator=" + moderator +
                 ", user=" + user +
+                ", time=" + time +
                 ", title='" + title + '\'' +
                 ", text='" + text + '\'' +
+                ", viewCount=" + viewCount +
+                ", likeVotes=" + likeVotes +
+                ", dislikeVotes=" + dislikeVotes +
                 ", tagToPosts=" + tagToPosts +
+                ", postComments=" + postComments +
                 '}';
     }
 }

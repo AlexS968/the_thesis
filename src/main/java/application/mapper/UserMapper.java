@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class UserMapper {
 
     @Bean
-    public ModelMapper modelMapper() {
+    public ModelMapper userModelMapper() {
         return new ModelMapper();
     }
 
@@ -18,9 +18,9 @@ public class UserMapper {
         AuthenticationResponse response = new AuthenticationResponse();
         response.setResult(true);
         response.setUser();
-        modelMapper().map(user, response);
+        userModelMapper().map(user, response);
         response.setUserModeration(user.isModerator());
-        //****************** не понятно, что такое settings здесь???? ************
+//****************** не понятно, что такое settings здесь???? ************
         response.setUserSettings(false);
         response.setUserModerationCount(moderationCount);
         return response;

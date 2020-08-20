@@ -1,14 +1,27 @@
 package application.api.request;
 
-import org.springframework.web.multipart.MultipartFile;
-
 public class ProfileRequest {
 
+    private Integer removePhoto;
+    private String password;
     private String name;
     private String email;
-    private String password;
-    private Integer removePhoto;
-    private MultipartFile photo;
+
+    public Integer getRemovePhoto() {
+        return removePhoto;
+    }
+
+    public void setRemovePhoto(Integer removePhoto) {
+        this.removePhoto = removePhoto;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public String getName() {
         return name;
@@ -26,37 +39,13 @@ public class ProfileRequest {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Integer getRemovePhoto() {
-        return removePhoto;
-    }
-
-    public void setRemovePhoto(Integer removePhoto) {
-        this.removePhoto = removePhoto;
-    }
-
-    public MultipartFile getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(MultipartFile photo) {
-        this.photo = photo;
-    }
-
     @Override
     public String toString() {
         return "ProfileRequest{" +
-                "name='" + name + '\'' +
-                ", email='" + email + '\'' +
+                "removePhoto=" + removePhoto +
                 ", password='" + password + '\'' +
-                ", removePhoto=" + removePhoto +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
                 '}';
     }
 }
