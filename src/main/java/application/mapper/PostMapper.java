@@ -1,15 +1,22 @@
 package application.mapper;
 
 import application.api.request.PostRequest;
-import application.api.response.*;
+import application.api.response.PostByIdResponse;
+import application.api.response.PostCommentResponse;
+import application.api.response.PostResponse;
+import application.api.response.PostsListResponse;
 import application.exception.ApiValidationException;
+import application.exception.EntNotFoundException;
+import application.exception.UserUnauthenticatedException;
 import application.exception.apierror.ApiValidationError;
 import application.model.*;
+import application.repository.PostRepository;
+import application.service.LoginServiceImpl;
 import application.service.TagServiceImpl;
-import org.modelmapper.ModelMapper;
-import org.springframework.context.annotation.Bean;
+import application.service.UserServiceImpl;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpSession;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -22,14 +29,18 @@ import java.util.Set;
 public class PostMapper {
 
     private final TagServiceImpl tagService;
+    private final UserServiceImpl userService;
+    private final PostRepository postRepository;
 
-    public PostMapper(TagServiceImpl tagService) {
+    public PostMapper(TagServiceImpl tagService, UserServiceImpl userService, PostRepository postRepository) {
         this.tagService = tagService;
+        this.userService = userService;
+        this.postRepository = postRepository;
     }
 
-    public PostsListResponse convertToDto(int offset, int limit, List<Post> posts, int moderationCounter) {
+    public PostsListResponse convertToDto(int offset, int limit, List<Post> posts) {
         if (posts != null) {
-            return new PostsListResponse(moderationCounter,
+            return new PostsListResponse(posts.size(),
                     posts.subList(offset, Math.min(offset + limit, posts.size())).stream()
                             .map(this::convertToDto).toArray(PostResponse[]::new));
         } else {
@@ -53,7 +64,17 @@ public class PostMapper {
         return response;
     }
 
-    public PostByIdResponse convertToDto(Post post, List<String> tags, List<PostComment> comments) {
+    public PostByIdResponse convertToDto(
+            Post post, List<String> tags, List<PostComment> comments, HttpSession session) {
+        Long userId = LoginServiceImpl.getSessionsId().get(session.getId());
+        User user = (userId != null) ? userService.findUserById(userId)
+                .orElseThrow(EntNotFoundException::new) : null;
+        //increase view counter under certain conditions
+        if (userId == null || (!user.isModerator() & post.getUser().getId() != userId)) {
+            post.setViewCount(post.getViewCount() + 1);
+            postRepository.save(post);
+        }
+        //create new dto
         PostByIdResponse response = new PostByIdResponse();
         response.setId(post.getId());
         response.setTimestamp(post.getTime().toEpochSecond(ZoneOffset.ofHours(1)));
@@ -71,26 +92,35 @@ public class PostMapper {
             PostCommentResponse[] commentResponses = new PostCommentResponse[comments.size()];
             for (int i = 0; i < comments.size(); i++) {
                 commentResponses[i] = new PostCommentResponse(comments.get(i).getId(),
-                        comments.get(i).getTime().toEpochSecond(ZoneOffset.ofHours(1)), comments.get(i).getText(),
-                        new PostCommentResponse.UserPostCommentResponse(post.getUser().getId(), post.getUser().getName(), post.getUser().getPhoto()));
+                        comments.get(i).getTime().toEpochSecond(ZoneOffset.ofHours(1)),
+                        comments.get(i).getText(), new PostCommentResponse
+                        .UserPostCommentResponse(post.getUser().getId(),
+                        post.getUser().getName(), post.getUser().getPhoto()));
             }
             response.setComments(commentResponses);
         }
         response.setTags(tags.toArray(tags.toArray(new String[0])));
-
         return response;
     }
 
-    public Post convertToEntity(PostRequest request, User user) {
+    public Post convertToEntity(PostRequest request, HttpSession session) {
+        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
+                .get(session.getId())).orElseThrow(UserUnauthenticatedException::new);
+        //check post title and text
+        ApiValidationError apiValidationError = new ApiValidationError();
+        boolean throwException = false;
         if (request.getTitle().length() < 3) {
-            throw new ApiValidationException(new ApiValidationError(
-                    "Заголовок не установлен", null), "");
+            apiValidationError.setTitle("Title is too short");
+            throwException = true;
         }
         if (request.getText().length() < 50) {
-            throw new ApiValidationException(new ApiValidationError(
-                    null, "Текст публикации слишком короткий"), "");
+            apiValidationError.setText("Text is too short");
+            throwException = true;
         }
-
+        if (throwException) {
+            throw new ApiValidationException(apiValidationError, "");
+        }
+        //if everything is ok, create new post
         Post post = new Post();
         post.setActive(true);
         post.setModerationStatus(ModerationStatus.NEW);

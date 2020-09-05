@@ -1,14 +1,15 @@
 package application.service;
 
-import application.exception.ApiValidationException;
-import application.exception.EntityNotFoundException;
+import application.api.request.LoginRequest;
 import application.model.User;
 import application.repository.UserRepository;
 import application.service.interfaces.LoginService;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -22,22 +23,24 @@ public class LoginServiceImpl implements LoginService {
         this.userRepository = userRepository;
     }
 
-    public User userAuthentication(String email, String password, String sessionId) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ApiValidationException(""));
-        if (user.getPassword().equals(password)) {
-            sessionsId.put(sessionId, user.getId());
-        } else {
-            throw new ApiValidationException("");
+    public void userAuthentication(LoginRequest request, HttpSession session) {
+        Optional<User> user = userRepository.findByEmail(request.getEmail());
+        if (user.isPresent()) {
+            if (user.get().getPassword().equals(request.getPassword())) {
+                sessionsId.put(session.getId(), user.get().getId());
+            }
         }
-        return user;
     }
 
-    public void logout(String sessionId) {
-        sessionsId.remove(sessionId);
+    public void logout(HttpSession session) {
+        sessionsId.remove(session.getId());
     }
 
     public static Map<String, Long> getSessionsId() {
         return sessionsId;
+    }
+
+    public void addSessionId (String sessionId, long userId){
+        sessionsId.put(sessionId,userId);
     }
 }

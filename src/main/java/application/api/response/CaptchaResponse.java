@@ -28,4 +28,12 @@ public class CaptchaResponse {
     public void setImage(String image) {
         this.image = image;
     }
+
+    @Override
+    public String toString() {
+        return "CaptchaResponse{" +
+                "secret='" + secret + '\'' +
+                ", image='" + image + '\'' +
+                '}';
+    }
 }

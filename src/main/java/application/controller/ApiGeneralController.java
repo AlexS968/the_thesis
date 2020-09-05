@@ -6,12 +6,7 @@ import application.api.request.PostCommentRequest;
 import application.api.request.ProfileRequest;
 import application.api.response.*;
 import application.exception.ApiValidationException;
-import application.exception.EntityNotFoundException;
-import application.exception.UserUnauthorizedException;
 import application.mapper.*;
-import application.model.Post;
-import application.model.PostComment;
-import application.model.User;
 import application.service.*;
 import application.service.interfaces.TagService;
 import org.springframework.http.HttpStatus;
@@ -37,13 +32,11 @@ public class ApiGeneralController {
     private final StatisticsServiceImpl statisticsService;
     private final StatisticsMapper statisticsMapper;
     private final PostServiceImpl postService;
-    private final UserServiceImpl userService;
     private final PostCommentServiceImpl postCommentService;
-    private final PostCommentMapper postCommentMapper;
     private final RegisterServiceImpl registerService;
     private final ImageServiceImpl imageService;
 
-    public ApiGeneralController(InitServiceImpl initService, GlobalSettingServiceImpl globalSettingService, GlobalSettingMapper settingMapper, TagService tagService, TagMapper tagMapper, CalendarServiceImpl calendarService, CalendarMapper calendarMapper, StatisticsServiceImpl statisticsService, StatisticsMapper statisticsMapper, PostServiceImpl postService, UserServiceImpl userService, PostCommentServiceImpl postCommentService, PostCommentMapper postCommentMapper, RegisterServiceImpl registerService, ImageServiceImpl imageService) {
+    public ApiGeneralController(InitServiceImpl initService, GlobalSettingServiceImpl globalSettingService, GlobalSettingMapper settingMapper, TagService tagService, TagMapper tagMapper, CalendarServiceImpl calendarService, CalendarMapper calendarMapper, StatisticsServiceImpl statisticsService, StatisticsMapper statisticsMapper, PostServiceImpl postService, PostCommentServiceImpl postCommentService, RegisterServiceImpl registerService, ImageServiceImpl imageService) {
         this.initService = initService;
         this.globalSettingService = globalSettingService;
         this.settingMapper = settingMapper;
@@ -54,9 +47,7 @@ public class ApiGeneralController {
         this.statisticsService = statisticsService;
         this.statisticsMapper = statisticsMapper;
         this.postService = postService;
-        this.userService = userService;
         this.postCommentService = postCommentService;
-        this.postCommentMapper = postCommentMapper;
         this.registerService = registerService;
         this.imageService = imageService;
     }
@@ -69,17 +60,14 @@ public class ApiGeneralController {
     @GetMapping(value = "api/settings")
     public ResponseEntity<GlobalSettingResponse> getSettings() {
         return new ResponseEntity<>(settingMapper.convertToDto(
-                globalSettingService.getGlobalSettings()),
-                HttpStatus.OK);
+                globalSettingService.getGlobalSettings()), HttpStatus.OK);
     }
 
     @PutMapping(value = "api/settings")
     public void setSettings(
             @Valid @RequestBody GlobalSettingRequest request, HttpSession session) {
-        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(EntityNotFoundException::new);
-        globalSettingService.saveGlobalSettings(
-                settingMapper.convertToEntity(request), user);
+        globalSettingService.saveGlobalSettings(settingMapper
+                .convertToEntity(request), session);
     }
 
     @GetMapping(value = "api/tag")
@@ -92,86 +80,62 @@ public class ApiGeneralController {
     @GetMapping(value = "api/calendar")
     public ResponseEntity<CalendarResponse> calendar(
             @RequestParam(required = false) int year) {
-        return new ResponseEntity<>(calendarMapper.convertToDto(
-                calendarService.postsByDayPerYear(year),
-                calendarService.timeOfEarliestPost()), HttpStatus.OK);
+        return new ResponseEntity<>(calendarMapper.convertToDto(calendarService
+                .postsByDayPerYear(year), calendarService.timeOfEarliestPost()), HttpStatus.OK);
     }
 
     @GetMapping(value = "api/statistics/all")
     public ResponseEntity<StatisticsResponse> allStatistics(HttpSession session) {
-        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(EntityNotFoundException::new);
-        if (!globalSettingService.statisticsIsPublic() & !user.isModerator()) {
-            throw new UserUnauthorizedException();
-        }
         return new ResponseEntity<>(statisticsMapper.convertToDto(
-                statisticsService.getAllPostsOrderByTimeAsc()), HttpStatus.OK);
+                statisticsService.getAllPostsOrderByTimeAsc(session)), HttpStatus.OK);
     }
 
     @GetMapping(value = "api/statistics/my")
     public ResponseEntity<StatisticsResponse> myStatistics(HttpSession session) {
-        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(EntityNotFoundException::new);
         return new ResponseEntity<>(statisticsMapper.convertToDto(
-                statisticsService.getAllPostsByUserIdOrderByTimeAsc(user.getId())),
-                HttpStatus.OK);
+                statisticsService.getAllPostsByUserIdOrderByTimeAsc(session)), HttpStatus.OK);
     }
 
     @PostMapping("api/moderation")
     public ResponseEntity<ResultResponse> moderation(
             @Valid @RequestBody ModerationRequest request, HttpSession session) {
-        User moderator = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(EntityNotFoundException::new);
-        postService.moderatePost(request.getPost_id(), moderator, request.getDecision());
+        return new ResponseEntity<>(new ResultResponse(postService
+                .moderatePost(request, session)), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "api/image", consumes = {"multipart/form-data"})
+    public ResponseEntity<String> image(
+            @RequestParam("image") MultipartFile file,
+            HttpSession session) throws IOException {
+        return new ResponseEntity<>(imageService.uploadImage(file, session), HttpStatus.OK);
+    }
+
+    @PostMapping(path = "api/profile/my", consumes = {"multipart/form-data"})
+    public ResponseEntity<ResultResponse> profileWithPhoto(
+            @RequestParam(name = "photo", required = false) MultipartFile file,
+            @RequestParam(required = false) Integer removePhoto,
+            @RequestParam(required = false) String password,
+            @RequestParam String name,
+            @RequestParam String email,
+            HttpSession session) throws Exception {
+        registerService.changeProfile(file, removePhoto, password, name, email, session);
         return new ResponseEntity<>(new ResultResponse(true), HttpStatus.OK);
     }
 
-    @PostMapping("api/image")
-    public ResponseEntity<String> image(@RequestParam("image") MultipartFile file,
-                                        HttpSession session) throws IOException {
-        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(EntityNotFoundException::new);
-
-        return new ResponseEntity<>(imageService.uploadImage(file, user), HttpStatus.OK);
-    }
-
-    @PostMapping(path = "api/profile/my", headers = "Content-Type=multipart/form-data")
-    public ResponseEntity<ResultResponse> profileWithPhoto(@RequestParam(name = "photo", required = false) MultipartFile file,
-                                                           @RequestParam(required = false) Integer removePhoto,
-                                                           @RequestParam(required = false) String password, @RequestParam String name,
-                                                           @RequestParam String email, HttpSession session) throws Exception {
-        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(EntityNotFoundException::new);
-
-        registerService.changeProfile(file, removePhoto, password, name, email, user);
-        return new ResponseEntity<>(new ResultResponse(true), HttpStatus.OK);
-    }
-
-    @PostMapping(path = "api/profile/my", headers = "Content-Type=application/json;charset=UTF-8")
+    @PostMapping(path = "api/profile/my", consumes = {"application/json;charset=UTF-8"})
     public ResponseEntity<ResultResponse> profileWithoutPhoto(
-            @Valid @RequestBody ProfileRequest request, HttpSession session)
-            throws Exception {
-        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(EntityNotFoundException::new);
-
-        registerService.changeProfile(null, request.getRemovePhoto(), request.getPassword(),
-                request.getName(), request.getEmail(), user);
+            @Valid @RequestBody ProfileRequest request,
+            HttpSession session) throws Exception {
+        registerService.changeProfile(null, request.getRemovePhoto(),
+                request.getPassword(), request.getName(), request.getEmail(), session);
         return new ResponseEntity<>(new ResultResponse(true), HttpStatus.OK);
     }
 
     @PostMapping("api/comment")
     public ResponseEntity<CommentResponse> comment(
-            @Valid @RequestBody PostCommentRequest request, HttpSession session) throws ApiValidationException {
-        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(EntityNotFoundException::new);
-
-        Post post = postService.getPostByID(request.getPost_id());
-        Long parentCommentId = request.getParent_id();
-        PostComment parentComment = parentCommentId != null ?
-                postCommentService.getCommentById(parentCommentId) : null;
-
-        long commentId = postCommentService.addPostComment(postCommentMapper.convertToEntity(
-                user, post, parentComment, parentCommentId, request.getText()));
-        return new ResponseEntity<>(new CommentResponse(commentId), HttpStatus.OK);
+            @Valid @RequestBody PostCommentRequest request,
+            HttpSession session) throws ApiValidationException {
+        return new ResponseEntity<>(new CommentResponse(postCommentService
+                .addPostComment(request, session)), HttpStatus.OK);
     }
 }

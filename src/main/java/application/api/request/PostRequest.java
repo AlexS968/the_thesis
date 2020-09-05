@@ -1,7 +1,5 @@
 package application.api.request;
 
-import java.util.Arrays;
-
 public class PostRequest {
 
     private long timestamp;
@@ -9,6 +7,17 @@ public class PostRequest {
     private String title;
     private String[] tags;
     private String text;
+
+    public PostRequest() {
+    }
+
+    public PostRequest(long timestamp, int active, String title, String[] tags, String text) {
+        this.timestamp = timestamp;
+        this.active = active;
+        this.title = title;
+        this.tags = tags;
+        this.text = text;
+    }
 
     public long getTimestamp() {
         return timestamp;

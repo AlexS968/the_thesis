@@ -17,17 +17,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private static final Logger logger =
             LogManager.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler(value = {EntityNotFoundException.class})
+    @ExceptionHandler(value = {EntNotFoundException.class})
     protected ResponseEntity<ApiError> handleEntityNotFoundException(
-            EntityNotFoundException ex, WebRequest req) {
-        logger.error(ex.getMessage());
+            EntNotFoundException ex, WebRequest req) {
+        logger.error(ex.getClass().getName()+ ", " + ex.getMessage());
         return handleExceptionInternal(ex, null, HttpStatus.NOT_FOUND, req);
     }
 
-    @ExceptionHandler(value = {UserUnauthorizedException.class})
+    @ExceptionHandler(value = {UserUnauthenticatedException.class})
     protected ResponseEntity<ApiError> handleUserNotAuthorizedException(
-            UserUnauthorizedException ex, WebRequest req) {
-        logger.error(ex.getMessage());
+            UserUnauthenticatedException ex, WebRequest req) {
+        logger.error(ex.getClass().getName()+ ", " + ex.getMessage());
         return handleExceptionInternal(ex, null, HttpStatus.UNAUTHORIZED, req);
     }
 
@@ -41,8 +41,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {BadRequestException.class})
     protected ResponseEntity<ApiError> handleBadRequestException(
             BadRequestException ex, WebRequest req) {
-        logger.error(ex.getMessage());
-        return handleExceptionInternal(ex, new ApiError(ex.getMessage()), HttpStatus.BAD_REQUEST, req);
+        logger.warn(ex.getError().toString() + ", " + ex.getMessage());
+        return handleExceptionInternal(ex, ex.getError(), HttpStatus.BAD_REQUEST, req);
     }
 
     @ExceptionHandler(value = {Exception.class})

@@ -4,7 +4,7 @@ import application.exception.apierror.ApiValidationError;
 
 public class ApiValidationException extends RuntimeException {
 
-    ApiValidationError errors;
+    private ApiValidationError errors;
 
     public ApiValidationException(String message) {
         super(message);

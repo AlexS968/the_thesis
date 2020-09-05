@@ -1,12 +1,15 @@
 package application.service.interfaces;
 
+import application.api.request.LoginRequest;
 import application.model.User;
 
+import javax.servlet.http.HttpSession;
+import java.util.HashMap;
 import java.util.Map;
 
 public interface LoginService {
 
-    User userAuthentication(String email, String password, String sessionId);
+    void userAuthentication(LoginRequest request, HttpSession session);
 
-    void logout (String sessionId);
+    void logout (HttpSession session);
 }

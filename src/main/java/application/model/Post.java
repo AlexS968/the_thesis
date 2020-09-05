@@ -19,64 +19,64 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    //скрыта или активна публикация
+    //is post hidden or active
     @Column(name = "is_active", columnDefinition = "BOOLEAN", nullable = false)
     private boolean isActive;
 
-    //статус модерации, по умолчанию значение "NEW"
+    //moderation status, default value "NEW"
     @Enumerated(EnumType.STRING)
     @Column(name = "moderation_status", length = 8, columnDefinition = "default 'NEW'", nullable = false)
     @JsonProperty(value = "moderation_status")
     private ModerationStatus moderationStatus;
 
-    //ID пользователя-модератора, принявшего решение, или NULL
+    //moderator, who made decision
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "moderator_id")
     private User moderator;
 
-    //автор поста
+    //post author
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    //дата и время публикации поста
+    //post date and time
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime time;
 
-    //заголовок поста
+    //post title
     @NotBlank
     @Column(nullable = false)
     private String title;
 
-    //текст поста
+    //post text
     @NotBlank
     @Column(columnDefinition = "TEXT", nullable = false)
     private String text;
 
-    //количество просмотров поста
+    //post views
     @Column(name = "view_count", nullable = false)
     private int viewCount;
 
-    //коллекция лайков
+    //likes
     @OneToMany
     @JoinColumn(name = "post_id", referencedColumnName = "id", insertable = false, updatable = false)
     @Where(clause = "value = true")
     @LazyCollection(LazyCollectionOption.EXTRA)
     private Set<PostVote> likeVotes;
 
-    //коллекция дизлайков
+    //dislikes
     @OneToMany
     @JoinColumn(name = "post_id", referencedColumnName = "id", insertable = false, updatable = false)
     @Where(clause = "value = false")
     @LazyCollection(LazyCollectionOption.EXTRA)
     private Set<PostVote> dislikeVotes;
 
-    //коллекция тэгов
+    //tags
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private Set<TagToPost> tagToPosts;
 
-    //коллекция комментариев
+    //comments
     @OneToMany(mappedBy = "post")
     private Set<PostComment> postComments;
 

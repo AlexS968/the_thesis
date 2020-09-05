@@ -1,5 +1,6 @@
 package application.service.interfaces;
 
+import application.api.request.PasswordRestoreRequest;
 import application.model.User;
 
 import java.util.Optional;
@@ -10,7 +11,7 @@ public interface UserService {
 
     Optional<User> findUserById(Long id);
 
-    void restorePassword(String email);
+    void restorePassword(PasswordRestoreRequest request);
 
     User saveUser(User user);
 }

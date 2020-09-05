@@ -5,18 +5,18 @@ import application.api.request.PostRequest;
 import application.api.response.PostByIdResponse;
 import application.api.response.PostsListResponse;
 import application.api.response.ResultResponse;
-import application.exception.EntityNotFoundException;
+import application.exception.EntNotFoundException;
 import application.mapper.PostMapper;
-import application.model.Post;
-import application.model.User;
-import application.service.*;
+import application.service.PostCommentServiceImpl;
+import application.service.PostServiceImpl;
+import application.service.PostVoteServiceImpl;
+import application.service.TagServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/post")
@@ -26,119 +26,98 @@ public class ApiPostController {
     private final PostMapper postMapper;
     private final TagServiceImpl tagService;
     private final PostCommentServiceImpl postCommentService;
-    private final UserServiceImpl userService;
     private final PostVoteServiceImpl postVoteService;
 
-    public ApiPostController(PostServiceImpl postService, PostMapper postMapper, TagServiceImpl tagService, PostCommentServiceImpl postCommentService, UserServiceImpl userService, PostVoteServiceImpl postVoteService) {
+    public ApiPostController(PostServiceImpl postService, PostMapper postMapper, TagServiceImpl tagService, PostCommentServiceImpl postCommentService, PostVoteServiceImpl postVoteService) {
         this.postService = postService;
         this.postMapper = postMapper;
         this.tagService = tagService;
         this.postCommentService = postCommentService;
-        this.userService = userService;
         this.postVoteService = postVoteService;
     }
 
     @GetMapping(value = "")
     public ResponseEntity<PostsListResponse> allPosts(
-            @RequestParam int offset, @RequestParam int limit, @RequestParam String mode) {
-        List<Post> allPosts = postService.getSortedPosts(mode);
+            @RequestParam int offset, @RequestParam int limit,
+            @RequestParam String mode) {
         return new ResponseEntity<>(postMapper.convertToDto(offset, limit,
-                allPosts, allPosts.size()), HttpStatus.OK);
-    }
-
-    @PostMapping(value = "")
-    public ResponseEntity<ResultResponse> newPost(
-            @Valid @RequestBody PostRequest request, HttpSession session) {
-        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(EntityNotFoundException::new);
-
-        postService.savePost(postMapper.convertToEntity(request, user));
-        return new ResponseEntity<>(new ResultResponse(true), HttpStatus.OK);
+                postService.getSortedPosts(mode)), HttpStatus.OK);
     }
 
     @GetMapping(value = "/search")
     public ResponseEntity<PostsListResponse> postsOnQuery(
-            @RequestParam int offset, @RequestParam int limit, @RequestParam String query) {
-        List<Post> postsOnQuery = postService.getQueriedPosts(query);
+            @RequestParam int offset, @RequestParam int limit,
+            @RequestParam String query) {
         return new ResponseEntity<>(postMapper.convertToDto(offset, limit,
-                postService.getQueriedPosts(query), postsOnQuery.size()), HttpStatus.OK);
+                postService.getQueriedPosts(query)), HttpStatus.OK);
     }
 
     @GetMapping(value = "/byTag")
     public ResponseEntity<PostsListResponse> postsByTag(
-            @RequestParam int offset, @RequestParam int limit, @RequestParam String tag) {
-        List<Post> postsByTag = postService.getPostsByTag(tag);
+            @RequestParam int offset, @RequestParam int limit,
+            @RequestParam String tag) {
         return new ResponseEntity<>(postMapper.convertToDto(offset, limit,
-                postsByTag, postsByTag.size()), HttpStatus.OK);
+                postService.getPostsByTag(tag)), HttpStatus.OK);
     }
 
     @GetMapping(value = "/byDate")
     public ResponseEntity<PostsListResponse> postsByDate(
-            @RequestParam int offset, @RequestParam int limit, @RequestParam String date) {
-        List<Post> postsByDate = postService.getPostsByDate(date);
+            @RequestParam int offset, @RequestParam int limit,
+            @RequestParam String date) {
         return new ResponseEntity<>(postMapper.convertToDto(offset, limit,
-                postsByDate, postsByDate.size()), HttpStatus.OK);
+                postService.getPostsByDate(date)), HttpStatus.OK);
     }
 
     @GetMapping(value = "/my")
     public ResponseEntity<PostsListResponse> myPosts(
-            @RequestParam int offset, @RequestParam int limit, @RequestParam String status, HttpSession session) {
-        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(EntityNotFoundException::new);
-
-        List<Post> myPosts = postService.getMyPosts(user, status);
+            @RequestParam int offset, @RequestParam int limit,
+            @RequestParam String status, HttpSession session) {
         return new ResponseEntity<>(postMapper.convertToDto(offset, limit,
-                myPosts, myPosts.size()), HttpStatus.OK);
+                postService.getMyPosts(session, status)), HttpStatus.OK);
     }
 
     @GetMapping(value = "/moderation")
     public ResponseEntity<PostsListResponse> postsForModeration(
             @RequestParam int offset, @RequestParam int limit,
             @RequestParam String status, HttpSession session) {
-        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(EntityNotFoundException::new);
-
         return new ResponseEntity<>(postMapper.convertToDto(offset, limit,
-                postService.getPostsForModeration(user, status),
-                postService.getModerationCounter(user)), HttpStatus.OK);
+                postService.getPostsForModeration(session, status)), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<PostByIdResponse> PostByID(@PathVariable long id) {
-        return new ResponseEntity<>(postMapper.convertToDto(postService.getPostByID(id),
-                tagService.getTagsToPost(id), postCommentService.getTagsToPost(id)),
-                HttpStatus.OK);
+    public ResponseEntity<PostByIdResponse> postById(@PathVariable long id, HttpSession session) {
+        return new ResponseEntity<>(postMapper.convertToDto(postService.getPostByID(id)
+                        .orElseThrow(() -> new EntNotFoundException("post id: " + id)),
+                tagService.getTagsToPost(id), postCommentService.getTagsToPost(id), session), HttpStatus.OK);
     }
 
-    @PutMapping(value = "/{id}") // дописать
+    @PutMapping(value = "/{id}")
     public ResponseEntity<ResultResponse> updatePost(
-            @PathVariable long id, @Valid @RequestBody PostRequest request,
-            HttpSession session) {
-        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(EntityNotFoundException::new);
+            @PathVariable long id, @Valid @RequestBody PostRequest request, HttpSession session) {
+        postService.updatePost(id, request, session);
+        return new ResponseEntity<>(new ResultResponse(true), HttpStatus.OK);
+    }
 
-        postService.updatePost(id, request, user);
+    @PostMapping(value = "")
+    public ResponseEntity<ResultResponse> newPost(
+            @Valid @RequestBody PostRequest request, HttpSession session) {
+        postService.savePost(postMapper.convertToEntity(request, session));
         return new ResponseEntity<>(new ResultResponse(true), HttpStatus.OK);
     }
 
     @PostMapping("/like")
     public ResponseEntity<ResultResponse> like(
             @Valid @RequestBody LikeRequest request, HttpSession session) {
-        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(EntityNotFoundException::new);
-
         return new ResponseEntity<>(new ResultResponse(postVoteService
-                .like(postService.getPostByID(request.getPostId()), user, true)),
+                .like(postService.getPostByLikeRequest(request), session, true)),
                 HttpStatus.OK);
     }
 
     @PostMapping("/dislike")
     public ResponseEntity<ResultResponse> dislike(
             @Valid @RequestBody LikeRequest request, HttpSession session) {
-        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(EntityNotFoundException::new);
         return new ResponseEntity<>(new ResultResponse(postVoteService
-                .like(postService.getPostByID(request.getPostId()), user, false)),
+                .like(postService.getPostByLikeRequest(request), session, false)),
                 HttpStatus.OK);
     }
 }

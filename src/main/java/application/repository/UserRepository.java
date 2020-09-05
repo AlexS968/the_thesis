@@ -14,7 +14,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByCode(String code);
 
-    Optional<User> findById(long id);
+    @Override
+    Optional<User> findById(Long id);
 
     Optional<User> findByEmail(String email);
 
@@ -22,7 +23,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     void setUserCodeById(String code, long id);
 
     @Query(value = "SELECT EXISTS (SELECT 1 FROM users WHERE email = ?1)", nativeQuery = true)
-    boolean checkUserByEmail(String email);
+    boolean isUserEmailExist(String email);
 
     @Query(value = "SELECT EXISTS (SELECT 1 FROM users WHERE name = ?1)", nativeQuery = true)
     boolean checkUserByName(String name);

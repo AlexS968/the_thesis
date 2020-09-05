@@ -1,10 +1,13 @@
 package application.service;
 
+import application.api.request.PasswordRestoreRequest;
 import application.exception.ApiValidationException;
-import application.exception.EntityNotFoundException;
+import application.exception.EntNotFoundException;
+import application.exception.UserUnauthenticatedException;
 import application.model.User;
 import application.repository.UserRepository;
 import application.service.interfaces.UserService;
+import com.sun.istack.NotNull;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -30,8 +33,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> findUserById(Long id) {
-        if (id==null){
-            throw new EntityNotFoundException("User is not authenticated");
+        if (id == null) {
+            throw new UserUnauthenticatedException();
         }
         return userRepository.findById(id);
     }
@@ -41,8 +44,9 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    public void restorePassword(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(EntityNotFoundException::new);
+    public void restorePassword(PasswordRestoreRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(EntNotFoundException::new);
 
         String charsCaps = "abcdefghijklmnopqrstuvwxyz";
         String nums = "0123456789";
@@ -56,7 +60,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         // send link by email
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(email);
+        message.setTo(request.getEmail());
         message.setSubject("Ссылка на восстановление пароля MyBlog");
         message.setText("http://localhost:8080/login/change-password/" + hash.toString());
         // send Message!

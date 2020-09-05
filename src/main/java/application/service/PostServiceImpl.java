@@ -1,8 +1,12 @@
 package application.service;
 
+import application.api.request.LikeRequest;
+import application.api.request.ModerationRequest;
 import application.api.request.PostRequest;
 import application.exception.ApiValidationException;
 import application.exception.BadRequestException;
+import application.exception.EntNotFoundException;
+import application.exception.UserUnauthenticatedException;
 import application.exception.apierror.ApiValidationError;
 import application.model.ModerationStatus;
 import application.model.Post;
@@ -12,7 +16,7 @@ import application.repository.PostRepository;
 import application.service.interfaces.PostService;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
+import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -24,10 +28,12 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final TagServiceImpl tagService;
+    private final UserServiceImpl userService;
 
-    public PostServiceImpl(PostRepository postRepository, TagServiceImpl tagService) {
+    public PostServiceImpl(PostRepository postRepository, TagServiceImpl tagService, UserServiceImpl userService) {
         this.postRepository = postRepository;
         this.tagService = tagService;
+        this.userService = userService;
     }
 
     @Override
@@ -88,7 +94,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> getMyPosts(User user, String status) {
+    public List<Post> getMyPosts(HttpSession session, String status) {
+        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
+                .get(session.getId())).orElseThrow(UserUnauthenticatedException::new);
         boolean isActive;
         String moderationStatus;
         switch (status) {
@@ -104,10 +112,13 @@ public class PostServiceImpl implements PostService {
                 isActive = true;
                 moderationStatus = "DECLINED";
                 break;
-            default: //"published"
+            case "published":
                 isActive = true;
                 moderationStatus = "ACCEPTED";
                 break;
+            default:
+                isActive = true;
+                moderationStatus = "";
         }
         return postRepository
                 .findAllByIsActiveAndModerationStatusAndUserIdAndOrderByTimeDes(
@@ -115,20 +126,41 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> getPostsForModeration(User moderator, String status) {
+    public List<Post> getPostsForModeration(HttpSession session, String status) {
+        User moderator = userService.findUserById(LoginServiceImpl.getSessionsId()
+                .get(session.getId())).orElseThrow(UserUnauthenticatedException::new);
         List<Post> result;
-        if (status.equals("new")) {
+        switch (status) {
+            case "new":
+                result = postRepository.findAllByIsActiveAndModerationStatusNew(true);
+                break;
+            case "declined":
+                result = postRepository
+                        .findAllByIsActiveAndModeratorIdAndModerationStatusAndOrderByTimeDes(
+                                true, moderator.getId(), "DECLINED");
+                break;
+            case "accepted":
+                result = postRepository
+                        .findAllByIsActiveAndModeratorIdAndModerationStatusAndOrderByTimeDes(
+                                true, moderator.getId(), "ACCEPTED");
+                break;
+            default:
+                result = null;
+        }
+/*        if (status.equals("new")) {
             result = postRepository.findAllByIsActiveAndModerationStatusNew(true);
         } else {
             String moderationStatus = status.equals("declined") ? "DECLINED" : "ACCEPTED";
             result = postRepository
                     .findAllByIsActiveAndModeratorIdAndModerationStatusAndOrderByTimeDes(
                             true, moderator.getId(), moderationStatus);
-        }
+        }*/
         return result;
     }
 
-    public int getModerationCounter(User moderator) {
+    public int getModerationCounter(HttpSession session) {
+        User moderator = userService.findUserById(LoginServiceImpl.getSessionsId()
+                .get(session.getId())).orElseThrow(UserUnauthenticatedException::new);
         int result;
         if (moderator == null) {
             result = postRepository.findAllByIsActiveAndModerationStatusNew(true).size();
@@ -146,20 +178,33 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void moderatePost(long postId, User moderator, String decision) {
-        if (!moderator.isModerator()) {
-            throw new BadRequestException("User is not moderator!");
+    public boolean moderatePost(ModerationRequest request, HttpSession session) {
+        boolean result = false;
+        Long userId = LoginServiceImpl.getSessionsId().get(session.getId());
+        if (userId != null) {
+            User user = userService.findUserById(LoginServiceImpl.getSessionsId()
+                    .get(session.getId())).orElseThrow(EntNotFoundException::new);
+            if (user.isModerator()) {
+                Post post = postRepository.findById(request.getPost_id())
+                        .orElseThrow(EntNotFoundException::new);
+                post.setModerator(user);
+                post.setModerationStatus(request.getDecision().equals("accept") ?
+                        ModerationStatus.ACCEPTED : ModerationStatus.DECLINED);
+                postRepository.save(post);
+                result = true;
+            }
         }
-        Post post = postRepository.findById(postId)
-                .orElseThrow(EntityNotFoundException::new);
-        post.setModerator(moderator);
-        post.setModerationStatus(decision.equals("accept") ? ModerationStatus.ACCEPTED : ModerationStatus.DECLINED);
-        postRepository.save(post);
+        return result;
     }
 
     @Override
-    public Post getPostByID(long id) {
-        return postRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    public Optional<Post> getPostByID(long id) {
+        return postRepository.findById(id);
+    }
+
+    @Override
+    public Post getPostByLikeRequest(LikeRequest request) {
+        return postRepository.findById(request.getPostId()).orElseThrow(EntNotFoundException::new);
     }
 
     @Override
@@ -167,22 +212,29 @@ public class PostServiceImpl implements PostService {
         return postRepository.save(post);
     }
 
-    public Post updatePost(long postId, PostRequest request, User user) {
-        Post post = postRepository.findById(postId).orElseThrow(EntityNotFoundException::new);
+    public Post updatePost(long postId, PostRequest request, HttpSession session) {
+        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
+                .get(session.getId())).orElseThrow(UserUnauthenticatedException::new);
+        Post post = postRepository.findById(postId).orElseThrow(EntNotFoundException::new);
+        boolean throwException = false;
+        ApiValidationError error = new ApiValidationError();
         if (!post.getUser().equals(user)) {
             throw new BadRequestException("You don't have the right to change the post");
         }
         if (request.getTitle().length() >= 3) {
             post.setTitle(request.getTitle());
         } else {
-            throw new ApiValidationException(new ApiValidationError(
-                    "Заголовок не установлен", null), "");
+            error.setTitle("Title is too short");
+            throwException = true;
         }
         if (request.getText().length() >= 50) {
             post.setText(request.getText());
         } else {
-            throw new ApiValidationException(new ApiValidationError(
-                    null, "Текст публикации слишком короткий"), "");
+            error.setText("Text is too short");
+            throwException = true;
+        }
+        if (throwException) {
+            throw new ApiValidationException(error, "");
         }
         if (request.getTags() != null) {
             tagService.deleteAllTagsToPost(post);

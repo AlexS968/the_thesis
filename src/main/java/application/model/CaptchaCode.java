@@ -12,15 +12,15 @@ public class CaptchaCode {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    //дата и время генерации кода капчи
+    //date and time of captcha generation
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime time;
 
-    //код, отображаемый на картинке капчи
+    //code displayed in the captcha image
     @Column(length = 16, nullable = false)
     private String code;
 
-    //код, передаваемый в параметре
+    //secret captcha code
     @NotBlank
     @Column(name = "secret_code", length = 16, nullable = false)
     private String secretCode;
@@ -64,5 +64,15 @@ public class CaptchaCode {
 
     public void setSecretCode(String secretCode) {
         this.secretCode = secretCode;
+    }
+
+    @Override
+    public String toString() {
+        return "CaptchaCode{" +
+                "id=" + id +
+                ", time=" + time +
+                ", code='" + code + '\'' +
+                ", secretCode='" + secretCode + '\'' +
+                '}';
     }
 }

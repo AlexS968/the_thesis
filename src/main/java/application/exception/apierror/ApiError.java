@@ -24,6 +24,11 @@ public class ApiError {
         this.message = message;
     }
 
+    public ApiError(boolean result,ApiValidationError errors) {
+        this.result = result;
+        this.errors = errors;
+    }
+
     public boolean isResult() {
         return result;
     }

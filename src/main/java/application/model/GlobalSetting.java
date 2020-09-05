@@ -10,15 +10,15 @@ public class GlobalSetting {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    //системное имя настройки
+    //setting system name
     @Column(nullable = false)
     private String code;
 
-    //название настройки
+    //setting name
     @Column(nullable = false)
     private String name;
 
-    //значение настройки
+    //setting value
     @Column(nullable = false)
     private String value;
 
