@@ -2,12 +2,10 @@ package application.service;
 
 import application.api.request.PasswordRestoreRequest;
 import application.exception.ApiValidationException;
-import application.exception.EntNotFoundException;
 import application.exception.UserUnauthenticatedException;
 import application.model.User;
 import application.repository.UserRepository;
 import application.service.interfaces.UserService;
-import com.sun.istack.NotNull;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -46,7 +44,7 @@ public class UserServiceImpl implements UserService {
 
     public void restorePassword(PasswordRestoreRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(EntNotFoundException::new);
+                .orElseThrow(()->new ApiValidationException("There is no such email"));
 
         String charsCaps = "abcdefghijklmnopqrstuvwxyz";
         String nums = "0123456789";

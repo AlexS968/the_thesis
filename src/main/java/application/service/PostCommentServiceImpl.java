@@ -59,7 +59,7 @@ public class PostCommentServiceImpl implements PostCommentService {
         //check comment text
         if (request.getText().length() < 30) {
             throw new ApiValidationException(
-                    new ApiValidationError("Текст комментария не задан или слишком короткий"), "");
+                    new ApiValidationError("Text is missing or too short"), "");
         }
         //create and save new comment
         PostComment comment = postCommentRepository.save(new PostComment(

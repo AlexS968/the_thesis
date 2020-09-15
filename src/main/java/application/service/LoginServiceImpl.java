@@ -33,6 +33,7 @@ public class LoginServiceImpl implements LoginService {
     }
 
     public void logout(HttpSession session) {
+        System.out.println(session.getId());
         sessionsId.remove(session.getId());
     }
 

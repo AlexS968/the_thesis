@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.Optional;
 
 @Repository
 public interface CaptchaCodeRepository extends JpaRepository<CaptchaCode, Long> {
@@ -21,5 +22,5 @@ public interface CaptchaCodeRepository extends JpaRepository<CaptchaCode, Long> 
     boolean checkOldCaptcha(Timestamp time);
 
     @Query
-    CaptchaCode findByCode(String code);
+    Optional<CaptchaCode> findByCode(String code);
 }

@@ -29,7 +29,6 @@ public class CalendarServiceImpl implements CalendarService {
             from = LocalDateTime.of(givenYear, 1, 1, 0, 0);
             to = LocalDateTime.of(givenYear + 1, 1, 1, 0, 0);
         }
-
         postRepository.countPostsByDay(Timestamp.valueOf(from), Timestamp.valueOf(to)).forEach(element -> {
             posts.put(element.getName(), element.getTotal());
         });

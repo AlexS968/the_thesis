@@ -6,9 +6,11 @@ import application.api.request.PostCommentRequest;
 import application.api.request.ProfileRequest;
 import application.api.response.*;
 import application.exception.ApiValidationException;
-import application.mapper.*;
+import application.mapper.CalendarMapper;
+import application.mapper.GlobalSettingMapper;
+import application.mapper.StatisticsMapper;
+import application.mapper.TagMapper;
 import application.service.*;
-import application.service.interfaces.TagService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +27,7 @@ public class ApiGeneralController {
     private final InitServiceImpl initService;
     private final GlobalSettingServiceImpl globalSettingService;
     private final GlobalSettingMapper settingMapper;
-    private final TagService tagService;
+    private final TagServiceImpl tagService;
     private final TagMapper tagMapper;
     private final CalendarServiceImpl calendarService;
     private final CalendarMapper calendarMapper;
@@ -36,7 +38,7 @@ public class ApiGeneralController {
     private final RegisterServiceImpl registerService;
     private final ImageServiceImpl imageService;
 
-    public ApiGeneralController(InitServiceImpl initService, GlobalSettingServiceImpl globalSettingService, GlobalSettingMapper settingMapper, TagService tagService, TagMapper tagMapper, CalendarServiceImpl calendarService, CalendarMapper calendarMapper, StatisticsServiceImpl statisticsService, StatisticsMapper statisticsMapper, PostServiceImpl postService, PostCommentServiceImpl postCommentService, RegisterServiceImpl registerService, ImageServiceImpl imageService) {
+    public ApiGeneralController(InitServiceImpl initService, GlobalSettingServiceImpl globalSettingService, GlobalSettingMapper settingMapper, TagServiceImpl tagService, TagMapper tagMapper, CalendarServiceImpl calendarService, CalendarMapper calendarMapper, StatisticsServiceImpl statisticsService, StatisticsMapper statisticsMapper, PostServiceImpl postService, PostCommentServiceImpl postCommentService, RegisterServiceImpl registerService, ImageServiceImpl imageService) {
         this.initService = initService;
         this.globalSettingService = globalSettingService;
         this.settingMapper = settingMapper;

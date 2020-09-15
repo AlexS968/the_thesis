@@ -34,7 +34,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {ApiValidationException.class})
     protected ResponseEntity<ApiError> handleApiValidationException(
             ApiValidationException ex, WebRequest req) {
-        logger.warn(ex.getErrors().toString() + ", " + ex.getMessage());
+        logger.warn(ex.toString() + ", " + ex.getMessage());
         return handleExceptionInternal(ex, new ApiError(ex.getErrors()), HttpStatus.OK, req);
     }
 

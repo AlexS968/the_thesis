@@ -5,8 +5,8 @@ import application.exception.ApiValidationException;
 import application.exception.apierror.ApiValidationError;
 import application.model.User;
 import application.repository.CaptchaCodeRepository;
-import application.service.interfaces.PasswordService;
 import application.repository.UserRepository;
+import application.service.interfaces.PasswordService;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,21 +21,32 @@ public class PasswordServiceImpl implements PasswordService {
     }
 
     public void changePassword(ChangePasswordRequest request) {
-        User user = userRepository.findByCode(request.getCode())
-                .orElseThrow(() -> new ApiValidationException(new ApiValidationError("\"Ссылка для восстановления пароля устарела. " +
-                        "<a href=\\\"/auth/restore\\\">Запросить ссылку снова</a>\"", null, null), ""));
-
-        if (!captchaCodeRepository.findByCode(request.getCaptcha()).getSecretCode()
-                .equals(request.getCaptchaSecret())) {
-            throw new ApiValidationException(new ApiValidationError(
-                    null, null, "Код с картинки введён неверно"), "");
+        ApiValidationError apiValidationError = new ApiValidationError();
+        boolean throwException = false;
+        //check password recovery link
+        if (userRepository.findByCode(request.getCode()).isEmpty()) {
+            apiValidationError.setCode("\"Password recovery link is out of date. " +
+                    "<a href=\\\"/auth/restore\\\">Request link again</a>\"");
+            throwException = true;
         }
+        //check secret code
+        if (captchaCodeRepository.findByCode(request.getCaptcha()).isEmpty() ||
+                !captchaCodeRepository.findByCode(request.getCaptcha()).get().getSecretCode()
+                        .equals(request.getCaptchaSecret())) {
+            apiValidationError.setCaptcha("Code from the picture is entered incorrectly");
+            throwException = true;
+        }
+        //check password
         if (request.getPassword().length() < 6) {
-            throw new ApiValidationException(new ApiValidationError(
-                    null, "Пароль короче 6-ти символов", null), "");
+            apiValidationError.setPassword("Password is shorter than 6 characters");
+            throwException = true;
         }
-
-        user.setPassword(request.getPassword());
-        userRepository.save(user);
+        if (throwException) {
+            throw new ApiValidationException(apiValidationError, "");
+        } else {
+            User user = userRepository.findByCode(request.getCode()).get();
+            user.setPassword(request.getPassword());
+            userRepository.save(user);
+        }
     }
 }

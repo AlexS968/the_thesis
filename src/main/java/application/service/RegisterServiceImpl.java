@@ -41,21 +41,26 @@ public class RegisterServiceImpl implements RegisterService {
     public void createUser(RegisterRequest request) {
         ApiValidationError apiValidationError = new ApiValidationError();
         boolean throwException = false;
+        //check email
         if (userRepository.isUserEmailExist(request.getEmail())) {
-            apiValidationError.setEmail("Этот e-mail уже зарегистрирован");
+            apiValidationError.setEmail("User with this email already exists");
             throwException = true;
         }
+        //check name
         if (request.getName() == null || request.getName().isEmpty()) {
-            apiValidationError.setName("Имя указано неверно");
+            apiValidationError.setName("Name is incorrect");
             throwException = true;
         }
-        if (!captchaCodeRepository.findByCode(request.getCaptcha()).getSecretCode()
-                .equals(request.getCaptchaSecret())) {
-            apiValidationError.setCaptcha("Код с картинки введён неверно");
+        //check captcha
+        if (captchaCodeRepository.findByCode(request.getCaptcha()).isEmpty() ||
+                !captchaCodeRepository.findByCode(request.getCaptcha()).get()
+                        .getSecretCode().equals(request.getCaptchaSecret())) {
+            apiValidationError.setCaptcha("Code from the picture is entered incorrectly");
             throwException = true;
         }
+        //check password
         if (request.getPassword().length() < 6) {
-            apiValidationError.setPassword("Пароль короче 6-ти символов");
+            apiValidationError.setPassword("Password is shorter than 6 characters");
             throwException = true;
         }
         if (throwException) {
@@ -82,14 +87,14 @@ public class RegisterServiceImpl implements RegisterService {
                 if (userRepository.findByEmail(email).isEmpty()) {
                     user.setEmail(email);
                 } else {
-                    apiValidationError.setEmail("Этот e-mail уже зарегистрирован");
+                    apiValidationError.setEmail("User with this email already exists");
                     throwException = true;
                 }
             }
         }
         //save new name
         if (name == null || name.isEmpty()) {
-            apiValidationError.setName("Имя указано неверно");
+            apiValidationError.setName("Name is incorrect");
             throwException = true;
         } else {
             user.setName(name);
@@ -99,7 +104,7 @@ public class RegisterServiceImpl implements RegisterService {
             if (password.length() >= 6) {
                 user.setPassword(password);
             } else {
-                apiValidationError.setPassword("Пароль короче 6-ти символов");
+                apiValidationError.setPassword("Password is shorter than 6 characters");
                 throwException = true;
             }
         }
@@ -132,7 +137,7 @@ public class RegisterServiceImpl implements RegisterService {
                 //set avatar
                 user.setPhoto("/upload/avatar/" + fileName);
             } else {
-                apiValidationError.setPhoto("Фото слишком большое, нужно не более 5 Мб");
+                apiValidationError.setPhoto("Photo is too large, need no more than 5 Mb");
                 throwException = true;
             }
         }
@@ -144,7 +149,8 @@ public class RegisterServiceImpl implements RegisterService {
     }
 
     public boolean checkCaptcha(String code, String secretCode) {
-        return captchaCodeRepository.findByCode(code)
-                .getSecretCode().equals(secretCode);
+        return captchaCodeRepository.findByCode(code).isPresent() &
+                captchaCodeRepository.findByCode(code).get().getSecretCode()
+                        .equals(secretCode);
     }
 }

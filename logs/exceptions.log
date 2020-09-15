@@ -150,3 +150,144 @@ Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No q
 2020-09-05 15:14:26.797 [main] ERROR application.exception.GlobalExceptionHandler              - null
 2020-09-05 15:15:16.459 [main] ERROR application.exception.GlobalExceptionHandler              - null
 2020-09-05 15:18:08.351 [main] ERROR application.exception.GlobalExceptionHandler              - null
+2020-09-05 20:32:36.279 [http-nio-8080-exec-3] ERROR application.exception.GlobalExceptionHandler              - application.exception.EntNotFoundException, null
+2020-09-05 21:07:50.999 [http-nio-8080-exec-4] ERROR application.exception.GlobalExceptionHandler              - application.exception.EntNotFoundException, null
+2020-09-05 22:13:02.944 [main] ERROR application.exception.GlobalExceptionHandler              - query did not return a unique result: 2; nested exception is javax.persistence.NonUniqueResultException: query did not return a unique result: 2
+2020-09-05 22:13:59.714 [main] ERROR application.exception.GlobalExceptionHandler              - query did not return a unique result: 3; nested exception is javax.persistence.NonUniqueResultException: query did not return a unique result: 3
+2020-09-05 22:14:43.611 [main] ERROR application.exception.GlobalExceptionHandler              - query did not return a unique result: 4; nested exception is javax.persistence.NonUniqueResultException: query did not return a unique result: 4
+2020-09-05 22:16:22.675 [main] ERROR application.exception.GlobalExceptionHandler              - query did not return a unique result: 5; nested exception is javax.persistence.NonUniqueResultException: query did not return a unique result: 5
+2020-09-05 22:17:35.737 [main] ERROR application.exception.GlobalExceptionHandler              - query did not return a unique result: 6; nested exception is javax.persistence.NonUniqueResultException: query did not return a unique result: 6
+2020-09-05 22:19:32.778 [main] ERROR application.exception.GlobalExceptionHandler              - query did not return a unique result: 7; nested exception is javax.persistence.NonUniqueResultException: query did not return a unique result: 7
+2020-09-05 22:20:12.659 [main] ERROR application.exception.GlobalExceptionHandler              - query did not return a unique result: 8; nested exception is javax.persistence.NonUniqueResultException: query did not return a unique result: 8
+2020-09-05 22:20:44.273 [main] ERROR application.exception.GlobalExceptionHandler              - query did not return a unique result: 9; nested exception is javax.persistence.NonUniqueResultException: query did not return a unique result: 9
+2020-09-05 22:21:20.678 [main] ERROR application.exception.GlobalExceptionHandler              - query did not return a unique result: 10; nested exception is javax.persistence.NonUniqueResultException: query did not return a unique result: 10
+2020-09-05 22:22:18.575 [main] ERROR application.exception.GlobalExceptionHandler              - query did not return a unique result: 11; nested exception is javax.persistence.NonUniqueResultException: query did not return a unique result: 11
+2020-09-05 22:23:35.306 [main] ERROR application.exception.GlobalExceptionHandler              - query did not return a unique result: 12; nested exception is javax.persistence.NonUniqueResultException: query did not return a unique result: 12
+2020-09-05 22:24:14.011 [main] ERROR application.exception.GlobalExceptionHandler              - query did not return a unique result: 13; nested exception is javax.persistence.NonUniqueResultException: query did not return a unique result: 13
+2020-09-05 22:28:16.241 [main] ERROR application.exception.GlobalExceptionHandler              - query did not return a unique result: 2; nested exception is javax.persistence.NonUniqueResultException: query did not return a unique result: 2
+2020-09-05 22:31:31.788 [main] ERROR application.exception.GlobalExceptionHandler              - query did not return a unique result: 2; nested exception is javax.persistence.NonUniqueResultException: query did not return a unique result: 2
+2020-09-08 13:10:02.365 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.EntNotFoundException, post id: 10000
+2020-09-08 16:56:19.869 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.EntNotFoundException, post id: 10000
+2020-09-10 16:31:16.086 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.UserUnauthenticatedException, null
+2020-09-10 16:31:53.570 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.UserUnauthenticatedException, null
+2020-09-10 16:52:54.508 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.UserUnauthenticatedException, null
+2020-09-10 16:58:20.147 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.EntNotFoundException, post id: 10000
+2020-09-10 16:59:10.703 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.UserUnauthenticatedException, null
+2020-09-10 17:06:52.468 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.UserUnauthenticatedException, null
+2020-09-10 17:07:40.050 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.EntNotFoundException, post id: 10000
+2020-09-10 17:14:13.633 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:13.720 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:13.813 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:14.082 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:14.127 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.EntNotFoundException, post id: 10000
+2020-09-10 17:14:14.154 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:14.256 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:14.370 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:14.444 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:14.487 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:14.652 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:14.704 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:14.750 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:14.875 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:14.921 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:49.710 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:49.927 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:49.968 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:50.020 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:50.148 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:50.200 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:50.226 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.EntNotFoundException, post id: 10000
+2020-09-10 17:14:50.250 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:50.352 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:50.491 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:50.568 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:50.653 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:50.703 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:50.792 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:50.849 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:50.902 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:50.958 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:51.028 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:51.123 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:51.175 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:51.215 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:14:51.249 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:17:27.624 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:17:27.682 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:17:27.743 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:17:27.889 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:17:27.920 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.EntNotFoundException, post id: 10000
+2020-09-10 17:17:27.947 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:17:28.031 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:17:28.207 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:17:28.318 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:17:28.364 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:17:28.549 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:17:28.610 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:17:28.672 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:17:28.832 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:17:28.931 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper              - ERROR: update or delete on table "posts" violates foreign key constraint "post_comments_post_fk" on table "post_comments"
+  Detail: Key (id)=(1) is still referenced from table "post_comments".
+2020-09-10 17:21:27.277 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.EntNotFoundException, post id: 10000
+2020-09-10 17:23:18.939 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.EntNotFoundException, post id: 10000
+2020-09-14 19:36:26.554 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.UserUnauthenticatedException, null
+2020-09-14 19:39:20.102 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.UserUnauthenticatedException, null
+2020-09-15 12:42:33.368 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.UserUnauthenticatedException, null
+2020-09-15 15:56:20.816 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.UserUnauthenticatedException, null
+2020-09-15 16:03:56.984 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.UserUnauthenticatedException, null
+2020-09-15 16:49:59.282 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.UserUnauthenticatedException, null
+2020-09-15 16:51:01.582 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.UserUnauthenticatedException, null
+2020-09-15 16:51:32.588 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.EntNotFoundException, post id: 10000
+2020-09-15 17:38:40.029 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.EntNotFoundException, post id: 10000
+2020-09-15 17:39:35.821 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.EntNotFoundException, post id: 10000
+2020-09-15 17:41:09.137 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.EntNotFoundException, post id: 10000
+2020-09-15 17:42:58.223 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.UserUnauthenticatedException, null
+2020-09-15 17:43:44.995 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.UserUnauthenticatedException, null

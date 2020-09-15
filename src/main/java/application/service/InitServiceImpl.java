@@ -13,10 +13,10 @@ public class InitServiceImpl implements InitService {
 
         InitResponse initResponse = new InitResponse();
         initResponse.setTitle("DevPub");
-        initResponse.setSubtitle("Рассказы разработчиков");
+        initResponse.setSubtitle("Program developer stories");
         initResponse.setPhone("+7 903 666-44-55");
         initResponse.setEmail("mail@mail.ru");
-        initResponse.setCopyright("Дмитрий Сергеев");
+        initResponse.setCopyright("Dmitry Sergeev");
         initResponse.setCopyrightFrom("2005");
 
         return new ResponseEntity<>(initResponse, HttpStatus.OK);

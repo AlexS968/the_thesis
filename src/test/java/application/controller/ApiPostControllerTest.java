@@ -15,7 +15,6 @@ import application.model.PostComment;
 import application.repository.PostRepository;
 import application.repository.PostVoteRepository;
 import application.repository.TagRepository;
-import application.repository.UserRepository;
 import application.service.LoginServiceImpl;
 import application.service.PostServiceImpl;
 import org.junit.After;
@@ -40,8 +39,6 @@ public class ApiPostControllerTest extends AbstractIntegrationTest {
     private PostServiceImpl postService;
     @Autowired
     private PostRepository postRepository;
-    @Autowired
-    private UserRepository userRepository;
     @Autowired
     private TagRepository tagRepository;
     @Autowired
@@ -257,7 +254,7 @@ public class ApiPostControllerTest extends AbstractIntegrationTest {
                 "Test title", null, "Test");
         ApiValidationError errors = new ApiValidationError();
         errors.setText("Text is too short");
-        ApiError apiError = new ApiError(false,errors);
+        ApiError apiError = new ApiError(false, errors);
         mockMvc.perform(MockMvcRequestBuilders.put("/api/post/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(postRequest))
@@ -270,16 +267,17 @@ public class ApiPostControllerTest extends AbstractIntegrationTest {
     public void shouldPlaceNewPost() throws Exception {
         //authenticate user
         loginService.addSessionId(session.getId(), 1);
+        //create request
         PostRequest postRequest = new PostRequest(1122233934L, 1,
-                "Test title", new String[0], "Test text Test text Test text Test text Test text Test text ");
-        ResultResponse resultResponse = new ResultResponse(true);
+                "Test title", new String[0],
+                "Test text Test text Test text Test text Test text Test text ");
         mockMvc.perform(MockMvcRequestBuilders.post("/api/post/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(postRequest))
                 .session(session))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(
-                        mapper.writeValueAsString(resultResponse)));
+                        mapper.writeValueAsString(new ResultResponse(true))));
     }
 
     @Test
@@ -291,7 +289,7 @@ public class ApiPostControllerTest extends AbstractIntegrationTest {
                 "Hm", new String[0], "Test text Test text Test text Test text Test text Test text ");
         ApiValidationError errors = new ApiValidationError();
         errors.setTitle("Title is too short");
-        ApiError apiError = new ApiError(false,errors);
+        ApiError apiError = new ApiError(false, errors);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/post/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(postRequest))
@@ -367,7 +365,7 @@ public class ApiPostControllerTest extends AbstractIntegrationTest {
     @After
     public void tearDown() {
         //clear PostVoteRepository
-        postVoteRepository.deleteAllByPostIdAndByUserId(1,1);
-        postVoteRepository.deleteAllByPostIdAndByUserId(2,2);
+        postVoteRepository.deleteAllByPostIdAndByUserId(1, 1);
+        postVoteRepository.deleteAllByPostIdAndByUserId(2, 2);
     }
 }

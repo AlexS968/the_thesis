@@ -92,6 +92,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "ORDER BY time ASC LIMIT 1", nativeQuery = true)
     Post findEarliestPost();
 
+    @Query(value = "SELECT * " +
+            "FROM posts " +
+            "ORDER BY time DESC LIMIT 1", nativeQuery = true)
+    Post findLatestPost();
+
     @Query(value = "SELECT * FROM posts " +
             "WHERE is_active = ?1 AND moderation_status = ?2 " +
             "AND time <= ?3 AND to_char(time, 'YYYY-MM-DD') = ?4", nativeQuery = true)

@@ -22,4 +22,11 @@ public class ApiValidationException extends RuntimeException {
     public void setErrors(ApiValidationError errors) {
         this.errors = errors;
     }
+
+    @Override
+    public String toString() {
+        return "ApiValidationException{" +
+                "errors=" + errors +
+                '}';
+    }
 }
