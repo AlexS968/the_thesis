@@ -1,0 +1,1 @@
+web: java -jar target/my-blog-1.0.jar
