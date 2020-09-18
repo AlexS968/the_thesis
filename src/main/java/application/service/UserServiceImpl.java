@@ -42,6 +42,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
+    @Override
     public void restorePassword(PasswordRestoreRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(()->new ApiValidationException("There is no such email"));

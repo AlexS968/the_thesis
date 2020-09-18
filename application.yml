@@ -1,9 +1,25 @@
-spring.datasource.url: jdbc:postgresql://localhost/myblog
-spring.datasource.username: postgres
-spring.datasource.password:
-spring.jpa.generate-ddl: false
-spring.jpa.show-sql: false
-spring.jpa.hibernate.ddl-auto: validate
+spring:
+  datasource:
+    url: jdbc:${DATABASE_URL:postgresql://localhost:5432/myblog}
+    username: postgres
+    password:
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    generate-ddl: false
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+      enabled: true
+
+upload:
+  path: /Users/alex/Desktop/upload
+
+server:
+  port: ${PORT:8080}
 
 appEmail:
   email: javaentwickler20@gmail.com
@@ -11,9 +27,6 @@ appEmail:
 
 captchaExpirationTime: 1
 
-spring.servlet.multipart.max-file-size: 10MB
-spring.servlet.multipart.max-request-size: 10MB
-spring.servlet.multipart.enabled: true
-upload.path: /Users/alex/Desktop/upload
+
 
 
