@@ -1,22 +1,13 @@
 package application.api.response;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CommentResponse {
-
     long id;
-
-    public CommentResponse() {
-    }
-
-    public CommentResponse(long id) {
-        this.id = id;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 }
 

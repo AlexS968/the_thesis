@@ -5,6 +5,9 @@ import application.exception.UserUnauthenticatedException;
 import application.exception.apierror.ApiError;
 import application.exception.apierror.ApiValidationError;
 import application.service.interfaces.ImageService;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,8 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
+import java.util.Base64;
+import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 @Service
 public class ImageServiceImpl implements ImageService {
@@ -21,51 +25,41 @@ public class ImageServiceImpl implements ImageService {
     @Value("${upload.path}")
     private String uploadPath;
 
+    @Override
     public String uploadImage(MultipartFile file, HttpSession session) throws IOException {
-        String pathname = null;
+        if (file == null) {
+            throw new BadRequestException("File missing!");
+        }
         //check authentication
         if (LoginServiceImpl.getSessionsId().get(session.getId()) == null) {
             throw new UserUnauthenticatedException();
         }
-        //save picture and return link
-        if (file != null) {
-            ApiValidationError validationError = new ApiValidationError();
-            //check file size
-            if (file.getSize() > 5242880L) {
-                validationError.setImage("Размер файла превышает допустимый размер");
-                throw new BadRequestException(new ApiError(false, validationError), "");
-            }
-            //check file type
-            String fileType = Objects.requireNonNull(file.getContentType()).substring(6).trim();
-            if (!fileType.equals("jpeg") & !fileType.equals("png")) {
-                validationError.setImage("Недопустимый тип файла");
-                throw new BadRequestException(new ApiError(false, validationError), "");
-            }
-            String path = UUID.randomUUID().toString();
-            String firstDir = path.substring(0, 7);
-            String secondDir = path.substring(9, 12);
-            String thirdDir = path.substring(14, 17);
-            File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdir();
-            }
-            uploadDir = new File(uploadPath + "/" + firstDir);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdir();
-            }
-            uploadDir = new File(uploadPath + "/" + firstDir + "/" + secondDir);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdir();
-            }
-            uploadDir = new File(uploadPath + "/" + firstDir + "/" + secondDir + "/" + thirdDir);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdir();
-            }
-
-            String resultFilename = path.substring(19) + file.getOriginalFilename();
-            pathname = "/upload/" + firstDir + "/" + secondDir + "/" + thirdDir + "/" + resultFilename;
-            file.transferTo(new File(uploadPath + "/" + firstDir + "/" + secondDir + "/" + thirdDir + "/" + resultFilename));
+        ApiValidationError validationError = new ApiValidationError();
+        //check file size
+        if (file.getSize() > 5242880L) {
+            validationError.setImage("File is too large, need no more than 5 Mb");
+            throw new BadRequestException(new ApiError(false, validationError), "");
         }
-        return pathname;
+        //check file type
+        String fileType = Objects.requireNonNull(file.getContentType()).substring(6).trim();
+        if (!fileType.equals("jpeg") & !fileType.equals("png")) {
+            validationError.setImage("Invalid file type");
+            throw new BadRequestException(new ApiError(false, validationError), "");
+        }
+        //create random path and instance of Cloudinary with map of parameters to upload an image to Cloudinary
+        String path = "skillbox".concat(File.separator).concat(RandomStringUtils.randomAlphanumeric(2))
+                .concat(File.separator).concat(RandomStringUtils.randomAlphanumeric(2))
+                .concat(File.separator).concat(RandomStringUtils.randomAlphanumeric(2));
+        Map params = ObjectUtils.asMap(
+                "cloud_name", "dxywt3ld7",
+                "api_key", "372888264999633",
+                "api_secret", "ZJfDjL0K6wxdvtZr-cz0ua0-VSY",
+                "folder", path
+        );
+        Cloudinary cloudinary = new Cloudinary(params);
+        String base64DataURI = "data:image/png;base64,"
+                .concat(Base64.getEncoder().encodeToString(file.getBytes()));
+        Map result = cloudinary.uploader().upload(base64DataURI, params);
+        return "/upload/".concat(result.get("url").toString().split("upload")[1]);
     }
 }

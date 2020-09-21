@@ -12,4 +12,6 @@ public interface LoginService {
     void userAuthentication(LoginRequest request, HttpSession session);
 
     void logout (HttpSession session);
+
+    void addSessionId (String sessionId, long userId);
 }

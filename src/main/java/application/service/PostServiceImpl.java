@@ -14,6 +14,7 @@ import application.model.TagToPost;
 import application.model.User;
 import application.repository.PostRepository;
 import application.service.interfaces.PostService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
@@ -24,17 +25,11 @@ import java.time.ZoneId;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
-
     private final PostRepository postRepository;
     private final TagServiceImpl tagService;
     private final UserServiceImpl userService;
-
-    public PostServiceImpl(PostRepository postRepository, TagServiceImpl tagService, UserServiceImpl userService) {
-        this.postRepository = postRepository;
-        this.tagService = tagService;
-        this.userService = userService;
-    }
 
     @Override
     public List<Post> getPosts() {
@@ -147,14 +142,6 @@ public class PostServiceImpl implements PostService {
             default:
                 result = null;
         }
-/*        if (status.equals("new")) {
-            result = postRepository.findAllByIsActiveAndModerationStatusNew(true);
-        } else {
-            String moderationStatus = status.equals("declined") ? "DECLINED" : "ACCEPTED";
-            result = postRepository
-                    .findAllByIsActiveAndModeratorIdAndModerationStatusAndOrderByTimeDes(
-                            true, moderator.getId(), moderationStatus);
-        }*/
         return result;
     }
 
@@ -185,7 +172,7 @@ public class PostServiceImpl implements PostService {
             User user = userService.findUserById(LoginServiceImpl.getSessionsId()
                     .get(session.getId())).orElseThrow(EntNotFoundException::new);
             if (user.isModerator()) {
-                Post post = postRepository.findById(request.getPost_id())
+                Post post = postRepository.findById(request.getPostId())
                         .orElseThrow(EntNotFoundException::new);
                 post.setModerator(user);
                 post.setModerationStatus(request.getDecision().equals("accept") ?
@@ -204,7 +191,8 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Post getPostByLikeRequest(LikeRequest request) {
-        return postRepository.findById(request.getPostId()).orElseThrow(EntNotFoundException::new);
+        return postRepository.findById(request.getPostId())
+                .orElseThrow(EntNotFoundException::new);
     }
 
     @Override

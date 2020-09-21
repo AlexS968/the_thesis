@@ -1,6 +1,9 @@
 package application.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Where;
@@ -11,186 +14,58 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "posts")
 public class Post {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
-    //is post hidden or active
     @Column(name = "is_active", columnDefinition = "BOOLEAN", nullable = false)
-    private boolean isActive;
-
-    //moderation status, default value "NEW"
+    private boolean isActive; //is post hidden or active
     @Enumerated(EnumType.STRING)
     @Column(name = "moderation_status", length = 8, columnDefinition = "default 'NEW'", nullable = false)
     @JsonProperty(value = "moderation_status")
-    private ModerationStatus moderationStatus;
-
-    //moderator, who made decision
+    private ModerationStatus moderationStatus; //moderation status, default value "NEW"
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "moderator_id")
-    private User moderator;
-
-    //post author
+    private User moderator; //moderator, who made decision
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    //post date and time
+    private User user; //post author
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
-    private LocalDateTime time;
-
-    //post title
+    private LocalDateTime time; //post date and time
     @NotBlank
     @Column(nullable = false)
-    private String title;
-
-    //post text
+    private String title; //post title
     @NotBlank
     @Column(columnDefinition = "TEXT", nullable = false)
-    private String text;
-
-    //post views
+    private String text; //post text
     @Column(name = "view_count", nullable = false)
-    private int viewCount;
-
-    //likes
+    private int viewCount; //post views
     @OneToMany
     @JoinColumn(name = "post_id", referencedColumnName = "id", insertable = false, updatable = false)
     @Where(clause = "value = true")
     @LazyCollection(LazyCollectionOption.EXTRA)
-    private Set<PostVote> likeVotes;
-
-    //dislikes
+    private Set<PostVote> likeVotes; //likes
     @OneToMany
     @JoinColumn(name = "post_id", referencedColumnName = "id", insertable = false, updatable = false)
     @Where(clause = "value = false")
     @LazyCollection(LazyCollectionOption.EXTRA)
-    private Set<PostVote> dislikeVotes;
-
-    //tags
+    private Set<PostVote> dislikeVotes; //dislikes
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    private Set<TagToPost> tagToPosts;
-
-    //comments
+    private Set<TagToPost> tagToPosts; //tags
     @OneToMany(mappedBy = "post")
-    private Set<PostComment> postComments;
+    private Set<PostComment> postComments; //comments
 
-    public long getLikes() {
+    public long getLikesNumber() {
         return likeVotes == null ? 0 : likeVotes.size();
     }
 
-    public long dislikeVotes() {
+    public long dislikeVotesNumber() {
         return dislikeVotes == null ? 0 : dislikeVotes.size();
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
-    }
-
-    public ModerationStatus getModerationStatus() {
-        return moderationStatus;
-    }
-
-    public void setModerationStatus(ModerationStatus moderationStatus) {
-        this.moderationStatus = moderationStatus;
-    }
-
-    public User getModerator() {
-        return moderator;
-    }
-
-    public void setModerator(User moderator) {
-        this.moderator = moderator;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public LocalDateTime getTime() {
-        return time;
-    }
-
-    public void setTime(LocalDateTime time) {
-        this.time = time;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public int getViewCount() {
-        return viewCount;
-    }
-
-    public void setViewCount(int viewCount) {
-        this.viewCount = viewCount;
-    }
-
-    public Set<TagToPost> getTagToPosts() {
-        return tagToPosts;
-    }
-
-    public void setTagToPosts(Set<TagToPost> tagToPosts) {
-        this.tagToPosts = tagToPosts;
-    }
-
-    public Set<PostComment> getPostComments() {
-        return postComments;
-    }
-
-    public void setPostComments(Set<PostComment> postComments) {
-        this.postComments = postComments;
-    }
-
-    @Override
-    public String toString() {
-        return "Post{" +
-                "isActive=" + isActive +
-                ", moderationStatus=" + moderationStatus +
-                ", moderator=" + moderator +
-                ", user=" + user +
-                ", time=" + time +
-                ", title='" + title + '\'' +
-                ", text='" + text + '\'' +
-                ", viewCount=" + viewCount +
-                ", likeVotes=" + likeVotes +
-                ", dislikeVotes=" + dislikeVotes +
-                ", tagToPosts=" + tagToPosts +
-                ", postComments=" + postComments +
-                '}';
     }
 }

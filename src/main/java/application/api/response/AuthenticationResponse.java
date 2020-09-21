@@ -1,20 +1,17 @@
 package application.api.response;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
 public class AuthenticationResponse {
 
     private Boolean result;
     private UserAuthCheckResponse user;
 
-    public Boolean getResult() {
-        return result;
-    }
-
     public void setResult(Boolean result) {
         this.result = result;
-    }
-
-    public UserAuthCheckResponse getUser() {
-        return user;
     }
 
     public void setUser() {
@@ -49,8 +46,9 @@ public class AuthenticationResponse {
         this.user.setSettings(settings);
     }
 
+    @Data
+    @NoArgsConstructor
     static class UserAuthCheckResponse {
-
         private long id;
         private String name;
         private String photo;
@@ -58,62 +56,6 @@ public class AuthenticationResponse {
         private boolean moderation;
         private int moderationCount;
         private boolean settings;
-
-        public void setId(long id) {
-            this.id = id;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public void setPhoto(String photo) {
-            this.photo = photo;
-        }
-
-        public void setEmail(String email) {
-            this.email = email;
-        }
-
-        public void setModeration(boolean moderation) {
-            this.moderation = moderation;
-        }
-
-        public void setModerationCount(int moderationCount) {
-            this.moderationCount = moderationCount;
-        }
-
-        public void setSettings(boolean settings) {
-            this.settings = settings;
-        }
-
-        public long getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getPhoto() {
-            return photo;
-        }
-
-        public String getEmail() {
-            return email;
-        }
-
-        public boolean isModeration() {
-            return moderation;
-        }
-
-        public int getModerationCount() {
-            return moderationCount;
-        }
-
-        public boolean isSettings() {
-            return settings;
-        }
     }
 }
 

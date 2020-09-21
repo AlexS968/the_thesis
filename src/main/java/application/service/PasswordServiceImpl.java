@@ -7,19 +7,16 @@ import application.model.User;
 import application.repository.CaptchaCodeRepository;
 import application.repository.UserRepository;
 import application.service.interfaces.PasswordService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class PasswordServiceImpl implements PasswordService {
-
     private final UserRepository userRepository;
     private final CaptchaCodeRepository captchaCodeRepository;
 
-    public PasswordServiceImpl(UserRepository userRepository, CaptchaCodeRepository captchaCodeRepository) {
-        this.userRepository = userRepository;
-        this.captchaCodeRepository = captchaCodeRepository;
-    }
-
+    @Override
     public void changePassword(ChangePasswordRequest request) {
         ApiValidationError apiValidationError = new ApiValidationError();
         boolean throwException = false;

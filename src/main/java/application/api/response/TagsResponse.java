@@ -1,46 +1,21 @@
 package application.api.response;
 
-public class TagsResponse {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class TagsResponse {
     private TagResponse[] tags;
 
-    public TagsResponse(TagResponse[] tags) {
-        this.tags = tags;
-    }
-
-    public TagResponse[] getTags() {
-        return tags;
-    }
-
-    public void setTags(TagResponse[] tags) {
-        this.tags = tags;
-    }
-
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class TagResponse {
-
         private String name;
         private double weight;
-
-        public TagResponse(String name, double weight) {
-            this.name = name;
-            this.weight = weight;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public double getWeight() {
-            return weight;
-        }
-
-        public void setWeight(double weight) {
-            this.weight = weight;
-        }
     }
 }
 

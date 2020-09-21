@@ -1,22 +1,12 @@
 package application.api.request;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PasswordRestoreRequest {
-
     private String email;
-
-    public PasswordRestoreRequest() {
-        super();
-    }
-
-    public PasswordRestoreRequest(String email) {
-        this.email = email;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 }

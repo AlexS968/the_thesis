@@ -13,8 +13,8 @@ public class StatisticsMapper {
     public StatisticsResponse convertToDto(List<Post> posts) {
         StatisticsResponse response = new StatisticsResponse();
         response.setPostsCount(posts.size());
-        response.setLikesCount(posts.stream().map(Post::getLikes).reduce(0L, Long::sum));
-        response.setDislikesCount(posts.stream().map(Post::dislikeVotes).reduce(0L, Long::sum));
+        response.setLikesCount(posts.stream().map(Post::getLikesNumber).reduce(0L, Long::sum));
+        response.setDislikesCount(posts.stream().map(Post::dislikeVotesNumber).reduce(0L, Long::sum));
         response.setViewsCount(posts.stream().map(Post::getViewCount).reduce(0, Integer::sum));
         response.setFirstPublication(posts.get(0).getTime().toEpochSecond(ZoneOffset.ofHours(1)));
         return response;

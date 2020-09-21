@@ -11,6 +11,7 @@ import application.mapper.GlobalSettingMapper;
 import application.mapper.StatisticsMapper;
 import application.mapper.TagMapper;
 import application.service.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping(value = "/")
+@RequiredArgsConstructor
 public class ApiGeneralController {
 
     private final InitServiceImpl initService;
@@ -37,22 +39,6 @@ public class ApiGeneralController {
     private final PostCommentServiceImpl postCommentService;
     private final RegisterServiceImpl registerService;
     private final ImageServiceImpl imageService;
-
-    public ApiGeneralController(InitServiceImpl initService, GlobalSettingServiceImpl globalSettingService, GlobalSettingMapper settingMapper, TagServiceImpl tagService, TagMapper tagMapper, CalendarServiceImpl calendarService, CalendarMapper calendarMapper, StatisticsServiceImpl statisticsService, StatisticsMapper statisticsMapper, PostServiceImpl postService, PostCommentServiceImpl postCommentService, RegisterServiceImpl registerService, ImageServiceImpl imageService) {
-        this.initService = initService;
-        this.globalSettingService = globalSettingService;
-        this.settingMapper = settingMapper;
-        this.tagService = tagService;
-        this.tagMapper = tagMapper;
-        this.calendarService = calendarService;
-        this.calendarMapper = calendarMapper;
-        this.statisticsService = statisticsService;
-        this.statisticsMapper = statisticsMapper;
-        this.postService = postService;
-        this.postCommentService = postCommentService;
-        this.registerService = registerService;
-        this.imageService = imageService;
-    }
 
     @GetMapping(value = "api/init")
     public ResponseEntity<InitResponse> init() {

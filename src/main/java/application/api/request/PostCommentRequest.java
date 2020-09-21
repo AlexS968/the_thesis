@@ -1,32 +1,15 @@
 package application.api.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
 public class PostCommentRequest {
-
-    private Long parent_id;
-    private long post_id;
+    @JsonProperty("parent_id")
+    private Long parentId;
+    @JsonProperty("post_id")
+    private long postId;
     private String text;
-
-    public Long getParent_id() {
-        return parent_id;
-    }
-
-    public void setParent_id(Long parent_id) {
-        this.parent_id = parent_id;
-    }
-
-    public long getPost_id() {
-        return post_id;
-    }
-
-    public void setPost_id(long post_id) {
-        this.post_id = post_id;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
 }

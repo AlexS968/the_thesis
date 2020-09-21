@@ -10,5 +10,7 @@ public interface PostCommentService {
 
     List<PostComment> getTagsToPost(long id);
 
+    PostComment getCommentById(long id);
+
     long addPostComment(PostCommentRequest request, HttpSession session);
 }

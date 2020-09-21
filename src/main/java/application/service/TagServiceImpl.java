@@ -8,22 +8,17 @@ import application.repository.PostRepository;
 import application.repository.TagRepository;
 import application.repository.TagToPostRepository;
 import application.service.interfaces.TagService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class TagServiceImpl implements TagService {
-
     private final TagRepository tagRepository;
     private final PostRepository postRepository;
     private final TagToPostRepository tagToPostRepository;
-
-    public TagServiceImpl(TagRepository tagRepository, PostRepository postRepository, TagToPostRepository tagToPostRepository) {
-        this.tagRepository = tagRepository;
-        this.postRepository = postRepository;
-        this.tagToPostRepository = tagToPostRepository;
-    }
 
     @Override
     public List<Tag> getTags(String query) {
@@ -31,6 +26,7 @@ public class TagServiceImpl implements TagService {
                 : tagRepository.findAllByNameContaining(query);
     }
 
+    @Override
     public List<String> getTagsToPost(long id) {
         return tagRepository.findAllByPost(id);
     }
@@ -40,6 +36,7 @@ public class TagServiceImpl implements TagService {
         return tagRepository.save(tag);
     }
 
+    @Override
     public TagToPost getOrSaveTag(String name, Post post) {
         Tag tag = tagRepository.findByName(name).orElse(null);
         return (tag == null) ? new TagToPost(post, tagRepository.save(new Tag(name))) :
@@ -47,6 +44,7 @@ public class TagServiceImpl implements TagService {
                         .orElse(new TagToPost(post, tag));
     }
 
+    @Override
     public void deleteAllTagsToPost(Post post) {
         tagToPostRepository.deleteAllByPostId(post.getId());
     }
@@ -56,6 +54,7 @@ public class TagServiceImpl implements TagService {
         tagRepository.deleteById(id);
     }
 
+    @Override
     public List<IPostCount> getWeights() {
         return postRepository.countPostsByTag();
     }

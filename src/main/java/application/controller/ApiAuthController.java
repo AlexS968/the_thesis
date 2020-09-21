@@ -11,6 +11,7 @@ import application.mapper.CaptchaMapper;
 import application.mapper.UserMapper;
 import application.model.CaptchaCode;
 import application.service.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/api/auth")
+@RequiredArgsConstructor
 public class ApiAuthController {
 
     private final UserServiceImpl userService;
@@ -29,16 +31,6 @@ public class ApiAuthController {
     private final CaptchaMapper captchaMapper;
     private final RegisterServiceImpl registerService;
     private final PasswordServiceImpl passwordService;
-
-    public ApiAuthController(UserServiceImpl userService, UserMapper userMapper, LoginServiceImpl loginService, CaptchaServiceImpl captchaService, CaptchaMapper captchaMapper, RegisterServiceImpl registerService, PasswordServiceImpl passwordService) {
-        this.userService = userService;
-        this.userMapper = userMapper;
-        this.loginService = loginService;
-        this.captchaService = captchaService;
-        this.captchaMapper = captchaMapper;
-        this.registerService = registerService;
-        this.passwordService = passwordService;
-    }
 
     @GetMapping(value = "/check")
     public ResponseEntity<AuthenticationResponse> authCheck(HttpSession session) {

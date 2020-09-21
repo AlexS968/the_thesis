@@ -4,6 +4,7 @@ import application.api.request.LoginRequest;
 import application.model.User;
 import application.repository.UserRepository;
 import application.service.interfaces.LoginService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
@@ -12,17 +13,13 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class LoginServiceImpl implements LoginService {
-
+    private final UserRepository userRepository;
     //sessions id
     private static final Map<String, Long> sessionsId = new HashMap<>();
 
-    private final UserRepository userRepository;
-
-    public LoginServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
+    @Override
     public void userAuthentication(LoginRequest request, HttpSession session) {
         Optional<User> user = userRepository.findByEmail(request.getEmail());
         if (user.isPresent()) {
@@ -32,16 +29,17 @@ public class LoginServiceImpl implements LoginService {
         }
     }
 
+    @Override
     public void logout(HttpSession session) {
-        System.out.println(session.getId());
         sessionsId.remove(session.getId());
+    }
+
+    @Override
+    public void addSessionId(String sessionId, long userId) {
+        sessionsId.put(sessionId, userId);
     }
 
     public static Map<String, Long> getSessionsId() {
         return sessionsId;
-    }
-
-    public void addSessionId (String sessionId, long userId){
-        sessionsId.put(sessionId,userId);
     }
 }

@@ -334,12 +334,12 @@ public class ApiPostControllerTest extends AbstractIntegrationTest {
     public void shouldDislikePost() throws Exception {
         //authenticate the user who hasn't dislike the post yet
         loginService.addSessionId(session.getId(), 2);
-        LikeRequest postRequest = new LikeRequest(2L);
+        LikeRequest request = new LikeRequest(2L);
         //result should be true
         ResultResponse resultResponse = new ResultResponse(true);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/post/dislike")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(postRequest))
+                .content(mapper.writeValueAsString(request))
                 .session(session))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(

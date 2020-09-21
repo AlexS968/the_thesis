@@ -5,26 +5,25 @@ import application.exception.ApiValidationException;
 import application.exception.EntNotFoundException;
 import application.exception.UserUnauthenticatedException;
 import application.exception.apierror.ApiValidationError;
-import application.mapper.CaptchaMapper;
 import application.model.User;
 import application.repository.CaptchaCodeRepository;
 import application.repository.UserRepository;
-import application.service.interfaces.CaptchaService;
 import application.service.interfaces.RegisterService;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.Base64;
+import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class RegisterServiceImpl implements RegisterService {
-
     private final UserRepository userRepository;
     private final UserServiceImpl userService;
     private final CaptchaCodeRepository captchaCodeRepository;
@@ -32,12 +31,7 @@ public class RegisterServiceImpl implements RegisterService {
     @Value("${upload.path}")
     private String uploadPath;
 
-    public RegisterServiceImpl(UserRepository userRepository, UserServiceImpl userService, CaptchaCodeRepository captchaCodeRepository) {
-        this.userRepository = userRepository;
-        this.userService = userService;
-        this.captchaCodeRepository = captchaCodeRepository;
-    }
-
+    @Override
     public void createUser(RegisterRequest request) {
         ApiValidationError apiValidationError = new ApiValidationError();
         boolean throwException = false;
@@ -70,6 +64,7 @@ public class RegisterServiceImpl implements RegisterService {
                 LocalDateTime.now(), false));
     }
 
+    @Override
     public void changeProfile(MultipartFile file, Integer removePhoto, String password,
                               String name, String email, HttpSession session) throws Exception {
         //check authentication
@@ -117,25 +112,20 @@ public class RegisterServiceImpl implements RegisterService {
         //load new avatar
         if (file != null) {
             if (file.getSize() < 5242880L) {
-                File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists()) {
-                    uploadDir.mkdir();
-                }
-                String avtPath = uploadPath + "/avatar";
-                File avtDir = new File(avtPath);
-                if (!avtDir.exists()) {
-                    avtDir.mkdir();
-                }
-                //upload photo
-                String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
-                File avatar = new File(avtPath + "/" + fileName);
-                file.transferTo(avatar);
-                //resize photo
-                BufferedImage originalImage = ImageIO.read(avatar);
-                BufferedImage resizedImage = CaptchaService.resizeImage(originalImage, 36, 36);
-                ImageIO.write(resizedImage, "jpg", avatar);
-                //set avatar
-                user.setPhoto("/upload/avatar/" + fileName);
+                //create instance of Cloudinary to save avatar
+                Map params = ObjectUtils.asMap(
+                        "cloud_name", "dxywt3ld7",
+                        "api_key", "372888264999633",
+                        "api_secret", "ZJfDjL0K6wxdvtZr-cz0ua0-VSY",
+                        "folder","skillbox/avatar"
+                );
+                Cloudinary cloudinary = new Cloudinary(params);
+                String base64DataURI = "data:image/png;base64,"
+                        .concat(Base64.getEncoder().encodeToString(file.getBytes()));
+                Map result = cloudinary.uploader().upload(base64DataURI, params);
+                System.out.println(result.get("url"));
+                String imageTag = result.get("url").toString().split("/")[9];
+                user.setPhoto("/upload/c_fill,g_faces,h_36,w_36/skillbox/avatar/" + imageTag);
             } else {
                 apiValidationError.setPhoto("Photo is too large, need no more than 5 Mb");
                 throwException = true;
@@ -148,6 +138,7 @@ public class RegisterServiceImpl implements RegisterService {
         userRepository.save(user);
     }
 
+    @Override
     public boolean checkCaptcha(String code, String secretCode) {
         return captchaCodeRepository.findByCode(code).isPresent() &
                 captchaCodeRepository.findByCode(code).get().getSecretCode()

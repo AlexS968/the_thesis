@@ -4,6 +4,8 @@ import application.model.CaptchaCode;
 import application.repository.CaptchaCodeRepository;
 import application.service.interfaces.CaptchaService;
 import com.github.cage.YCage;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -14,33 +16,20 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Base64;
-import java.util.Random;
 
 @Service
+@RequiredArgsConstructor
 public class CaptchaServiceImpl implements CaptchaService {
-
     private final CaptchaCodeRepository captchaCodeRepository;
-
     @Value("${captchaExpirationTime}")
     public long capExpTime;
 
-    public CaptchaServiceImpl(CaptchaCodeRepository captchaCodeRepository) {
-        this.captchaCodeRepository = captchaCodeRepository;
-    }
-
+    @Override
     public CaptchaCode captchaGenerator() {
-        //generate secret_code
-        String passSymbols = "abcdefghijklmnopqrstuvwxyz0123456789";
-        Random rnd = new Random();
-        final StringBuilder randomString = new StringBuilder();
-        for (int i = 0; i < 15; i++) {
-            randomString.append(passSymbols.charAt(rnd.nextInt(passSymbols.length())));
-        }
         //create captcha
-        CaptchaCode captcha = new CaptchaCode(
-                LocalDateTime.now(),
-                new YCage().getTokenGenerator().next().substring(0, 4), //generate code
-                randomString.toString());
+        CaptchaCode captcha = new CaptchaCode(LocalDateTime.now(),
+                new YCage().getTokenGenerator().next().substring(0, 4),
+                RandomStringUtils.randomAlphanumeric(15));
         //save captcha
         captchaCodeRepository.save(captcha);
         //delete old captcha
@@ -51,10 +40,11 @@ public class CaptchaServiceImpl implements CaptchaService {
         return captcha;
     }
 
+    @Override
     public String conversionToBase64(CaptchaCode captcha) throws IOException {
         //resize image
-        BufferedImage img = CaptchaService.resizeImage(new YCage().drawImage(captcha.getCode()),
-                100, 35);
+        BufferedImage img = CaptchaService.resizeImage(new YCage()
+                .drawImage(captcha.getCode()), 100, 35);
         //conversion image to byte[]
         byte[] resizedCaptcha;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {

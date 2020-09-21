@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class InitServiceImpl implements InitService {
 
+    @Override
     public ResponseEntity<InitResponse> getInit() {
-
         InitResponse initResponse = new InitResponse();
         initResponse.setTitle("DevPub");
         initResponse.setSubtitle("Program developer stories");
@@ -18,7 +18,6 @@ public class InitServiceImpl implements InitService {
         initResponse.setEmail("mail@mail.ru");
         initResponse.setCopyright("Dmitry Sergeev");
         initResponse.setCopyrightFrom("2005");
-
         return new ResponseEntity<>(initResponse, HttpStatus.OK);
     }
 }

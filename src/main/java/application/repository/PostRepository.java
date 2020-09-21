@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
@@ -90,12 +91,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "SELECT * " +
             "FROM posts " +
             "ORDER BY time ASC LIMIT 1", nativeQuery = true)
-    Post findEarliestPost();
+    Optional<Post> findEarliestPost();
 
     @Query(value = "SELECT * " +
             "FROM posts " +
             "ORDER BY time DESC LIMIT 1", nativeQuery = true)
-    Post findLatestPost();
+    Optional<Post> findLatestPost();
 
     @Query(value = "SELECT * FROM posts " +
             "WHERE is_active = ?1 AND moderation_status = ?2 " +

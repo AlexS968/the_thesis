@@ -13,10 +13,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CalendarServiceTest {
@@ -31,7 +28,7 @@ public class CalendarServiceTest {
         LocalDateTime postTime = LocalDateTime.now().minusYears(100);
         Post post = new Post();
         post.setTime(postTime);
-        Mockito.when(postRepository.findEarliestPost()).thenReturn(post);
+        Mockito.when(postRepository.findEarliestPost()).thenReturn(Optional.of(post));
         Assert.assertEquals(postTime, calendarService.timeOfEarliestPost());
     }
 
@@ -43,6 +40,7 @@ public class CalendarServiceTest {
             public String getName() {
                 return "2019-02-14";
             }
+
             @Override
             public Integer getTotal() {
                 return 2;

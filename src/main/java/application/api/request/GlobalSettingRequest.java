@@ -1,46 +1,16 @@
 package application.api.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
 public class GlobalSettingRequest {
-
-    private boolean multiuserMode;
-    private boolean postPremoderation;
-    private boolean statisticsIsPublic;
-
-    public boolean isMultiuserMode() {
-        return multiuserMode;
-    }
-
     @JsonProperty("MULTIUSER_MODE")
-    public void setMultiuserMode(boolean multiuserMode) {
-        this.multiuserMode = multiuserMode;
-    }
-
-    public boolean isPostPremoderation() {
-        return postPremoderation;
-    }
-
+    private boolean multiuserMode;
     @JsonProperty("POST_PREMODERATION")
-    public void setPostPremoderation(boolean postPremoderation) {
-        this.postPremoderation = postPremoderation;
-    }
-
-    public boolean isStatisticsIsPublic() {
-        return statisticsIsPublic;
-    }
-
+    private boolean postPremoderation;
     @JsonProperty("STATISTICS_IS_PUBLIC")
-    public void setStatisticsIsPublic(boolean statisticsIsPublic) {
-        this.statisticsIsPublic = statisticsIsPublic;
-    }
-
-    @Override
-    public String toString() {
-        return "GlobalSettingRequest{" +
-                "multiuserMode=" + multiuserMode +
-                ", postPremoderation=" + postPremoderation +
-                ", statisticsIsPublic=" + statisticsIsPublic +
-                '}';
-    }
+    private boolean statisticsIsPublic;
 }

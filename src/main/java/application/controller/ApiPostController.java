@@ -11,6 +11,7 @@ import application.service.PostCommentServiceImpl;
 import application.service.PostServiceImpl;
 import application.service.PostVoteServiceImpl;
 import application.service.TagServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/api/post")
+@RequiredArgsConstructor
 public class ApiPostController {
 
     private final PostServiceImpl postService;
@@ -27,14 +29,6 @@ public class ApiPostController {
     private final TagServiceImpl tagService;
     private final PostCommentServiceImpl postCommentService;
     private final PostVoteServiceImpl postVoteService;
-
-    public ApiPostController(PostServiceImpl postService, PostMapper postMapper, TagServiceImpl tagService, PostCommentServiceImpl postCommentService, PostVoteServiceImpl postVoteService) {
-        this.postService = postService;
-        this.postMapper = postMapper;
-        this.tagService = tagService;
-        this.postCommentService = postCommentService;
-        this.postVoteService = postVoteService;
-    }
 
     @GetMapping(value = "")
     public ResponseEntity<PostsListResponse> allPosts(
@@ -85,10 +79,12 @@ public class ApiPostController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<PostByIdResponse> postById(@PathVariable long id, HttpSession session) {
+    public ResponseEntity<PostByIdResponse> postById(
+            @PathVariable long id, HttpSession session) {
         return new ResponseEntity<>(postMapper.convertToDto(postService.getPostByID(id)
                         .orElseThrow(() -> new EntNotFoundException("post id: " + id)),
-                tagService.getTagsToPost(id), postCommentService.getTagsToPost(id), session), HttpStatus.OK);
+                tagService.getTagsToPost(id), postCommentService.getTagsToPost(id),
+                session), HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}")

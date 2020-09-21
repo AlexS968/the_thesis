@@ -1,18 +1,12 @@
 package application.api.response;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ResultResponse {
-
     boolean result;
-
-    public ResultResponse(boolean result) {
-        this.result = result;
-    }
-
-    public boolean isResult() {
-        return result;
-    }
-
-    public void setResult(boolean result) {
-        this.result = result;
-    }
 }

@@ -57,8 +57,8 @@ public class PostMapper {
         response.setUserName(post.getUser().getName());
         response.setTitle(post.getTitle());
         response.setAnnounce(post.getText().substring(0, Math.min(post.getText().length(), 100)) + "...");
-        response.setLikeCount(post.getLikes());
-        response.setDislikeCount(post.dislikeVotes());
+        response.setLikeCount(post.getLikesNumber());
+        response.setDislikeCount(post.dislikeVotesNumber());
         response.setCommentCount(post.getPostComments().size());
         response.setViewCount(post.getViewCount());
         return response;
@@ -81,8 +81,8 @@ public class PostMapper {
         response.setActive(post.isActive());
         response.setTitle(post.getTitle());
         response.setText(post.getText());
-        response.setLikeCount(post.getLikes());
-        response.setDislikeCount(post.dislikeVotes());
+        response.setLikeCount(post.getLikesNumber());
+        response.setDislikeCount(post.dislikeVotesNumber());
         response.setViewCount(post.getViewCount());
         response.setUser();
         response.setUserId(post.getUser().getId());

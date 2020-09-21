@@ -6,6 +6,7 @@ import application.api.request.ModerationRequest;
 import application.api.request.PostCommentRequest;
 import application.api.request.ProfileRequest;
 import application.api.response.*;
+import application.exception.EntNotFoundException;
 import application.exception.apierror.ApiError;
 import application.exception.apierror.ApiValidationError;
 import application.model.GlobalSetting;
@@ -73,11 +74,14 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
     @Test
     public void shouldGetSettings() throws Exception {
         //update repository
-        GlobalSetting setting1 = settingRepository.findByCode("MULTIUSER_MODE");
+        GlobalSetting setting1 = settingRepository.findByCode("MULTIUSER_MODE")
+                .orElseThrow(EntNotFoundException::new);
         setting1.setValue("Yes");
-        GlobalSetting setting2 = settingRepository.findByCode("POST_PREMODERATION");
+        GlobalSetting setting2 = settingRepository.findByCode("POST_PREMODERATION")
+                .orElseThrow(EntNotFoundException::new);
         setting2.setValue("No");
-        GlobalSetting setting3 = settingRepository.findByCode("STATISTICS_IS_PUBLIC");
+        GlobalSetting setting3 = settingRepository.findByCode("STATISTICS_IS_PUBLIC")
+                .orElseThrow(EntNotFoundException::new);
         setting3.setValue("Yes");
         settingRepository.save(setting1);
         settingRepository.save(setting2);
@@ -172,7 +176,8 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
         //authenticate user with userId = 1, user is not moderator
         loginService.addSessionId(session.getId(), 1);
         //prohibit show statistic
-        GlobalSetting setting = settingRepository.findByCode("STATISTICS_IS_PUBLIC");
+        GlobalSetting setting = settingRepository.findByCode("STATISTICS_IS_PUBLIC")
+                .orElseThrow(EntNotFoundException::new);
         setting.setValue("No");
         settingRepository.save(setting);
         mockMvc.perform(MockMvcRequestBuilders.get("/api/statistics/all"))
@@ -323,7 +328,7 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
         loginService.addSessionId(session.getId(), 1);
         //create request
         PostCommentRequest request = new PostCommentRequest();
-        request.setPost_id(2);
+        request.setPostId(2);
         request.setText("test comment, test comment, test comment");
         //create response
         CommentResponse response = new CommentResponse(
@@ -343,7 +348,7 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
         loginService.addSessionId(session.getId(), 1);
         //create request with too short comment text
         PostCommentRequest request = new PostCommentRequest();
-        request.setPost_id(2);
+        request.setPostId(2);
         request.setText("test comment");
         //create response
         ApiValidationError errors = new ApiValidationError();
@@ -365,7 +370,8 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
         post.setModerationStatus(ModerationStatus.ACCEPTED);
         postRepository.save(post);
         //recover GlobalSettingRepository
-        GlobalSetting setting = settingRepository.findByCode("STATISTICS_IS_PUBLIC");
+        GlobalSetting setting = settingRepository.findByCode("STATISTICS_IS_PUBLIC")
+                .orElseThrow(EntNotFoundException::new);
         setting.setValue("Yes");
         settingRepository.save(setting);
     }

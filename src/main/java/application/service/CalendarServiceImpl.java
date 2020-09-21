@@ -1,7 +1,9 @@
 package application.service;
 
+import application.exception.EntNotFoundException;
 import application.repository.PostRepository;
 import application.service.interfaces.CalendarService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -10,18 +12,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class CalendarServiceImpl implements CalendarService {
-
     private final PostRepository postRepository;
 
-    public CalendarServiceImpl(PostRepository postRepository) {
-        this.postRepository = postRepository;
-    }
-
+    @Override
     public Map<String, Integer> postsByDayPerYear(Integer givenYear) {
         Map<String, Integer> posts = new HashMap<>();
-        LocalDateTime from;
-        LocalDateTime to;
+        LocalDateTime from, to;
         if (givenYear == null || givenYear == LocalDateTime.now().getYear()) {
             from = LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0);
             to = LocalDateTime.now();
@@ -35,7 +33,9 @@ public class CalendarServiceImpl implements CalendarService {
         return posts;
     }
 
+    @Override
     public LocalDateTime timeOfEarliestPost() {
-        return postRepository.findEarliestPost().getTime();
+        return postRepository.findEarliestPost()
+                .orElseThrow(EntNotFoundException::new).getTime();
     }
 }
