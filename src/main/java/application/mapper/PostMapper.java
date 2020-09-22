@@ -91,11 +91,12 @@ public class PostMapper {
         if (comments != null) {
             PostCommentResponse[] commentResponses = new PostCommentResponse[comments.size()];
             for (int i = 0; i < comments.size(); i++) {
+                User commentator = comments.get(i).getUser();
                 commentResponses[i] = new PostCommentResponse(comments.get(i).getId(),
                         comments.get(i).getTime().toEpochSecond(ZoneOffset.ofHours(1)),
                         comments.get(i).getText(), new PostCommentResponse
-                        .UserPostCommentResponse(post.getUser().getId(),
-                        post.getUser().getName(), post.getUser().getPhoto()));
+                        .UserPostCommentResponse(commentator.getId(),
+                        commentator.getName(), commentator.getPhoto()));
             }
             response.setComments(commentResponses);
         }

@@ -123,7 +123,6 @@ public class RegisterServiceImpl implements RegisterService {
                 String base64DataURI = "data:image/png;base64,"
                         .concat(Base64.getEncoder().encodeToString(file.getBytes()));
                 Map result = cloudinary.uploader().upload(base64DataURI, params);
-                System.out.println(result.get("url"));
                 String imageTag = result.get("url").toString().split("/")[9];
                 user.setPhoto("/upload/c_fill,g_faces,h_36,w_36/skillbox/avatar/" + imageTag);
             } else {
