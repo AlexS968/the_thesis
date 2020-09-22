@@ -45,6 +45,6 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         // send link by email
         sendGridMailService.sendMail(request.getEmail(), "Password restore link to the DevPub blog",
-                "http://localhost:8080/login/change-password/" + restoreCode);
+                "https://sablin-java-skillbox.herokuapp.com/login/change-password/" + restoreCode);
     }
 }
