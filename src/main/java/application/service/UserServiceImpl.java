@@ -8,18 +8,15 @@ import application.repository.UserRepository;
 import application.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private final JavaMailSender emailSender;
+    private final SendGridMailServiceImpl sendGridMailService;
 
     @Override
     public User findUserByCode(String code) {
@@ -47,10 +44,7 @@ public class UserServiceImpl implements UserService {
         user.setCode(restoreCode);
         userRepository.save(user);
         // send link by email
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(request.getEmail());
-        message.setSubject("Password restore link to the DevPub blog");
-        message.setText("http://localhost:8080/login/change-password/" + restoreCode);
-        emailSender.send(message);
+        sendGridMailService.sendMail(request.getEmail(), "Password restore link to the DevPub blog",
+                "http://localhost:8080/login/change-password/" + restoreCode);
     }
 }
