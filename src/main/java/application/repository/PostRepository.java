@@ -56,9 +56,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             (boolean isActive, String moderationStatus, Timestamp time);
 
     @Query(value = "SELECT *, " +
-            "(SELECT COUNT(*) AS likes_number FROM post_votes WHERE post_votes.post_id = posts.id) " +
-            "FROM posts " +
-            "WHERE is_active = ?1 AND moderation_status = ?2 AND time <= ?3 " +
+            "(SELECT COUNT(*) AS likes_number FROM post_votes " +
+            "WHERE post_votes.post_id = posts.id AND post_votes.value = true) " +
+            "FROM posts WHERE is_active = ?1 AND moderation_status = ?2 AND time <= ?3 " +
             "ORDER BY likes_number DESC", nativeQuery = true)
     List<Post> findAllByIsActiveAndModerationStatusAndTimeLessThanEqualAndOrderByLikesNumberDes
             (boolean isActive, String moderationStatus, Timestamp time);

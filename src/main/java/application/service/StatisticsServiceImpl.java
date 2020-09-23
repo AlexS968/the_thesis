@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -21,11 +22,12 @@ public class StatisticsServiceImpl implements StatisticsService {
     private final GlobalSettingServiceImpl globalSettingService;
 
     public List<Post> getAllPostsOrderByTimeAsc(HttpSession session)
-            throws UserUnauthenticatedException{
-        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(EntNotFoundException::new);
+            throws UserUnauthenticatedException {
+        long userId = LoginServiceImpl.getSessionsId().getOrDefault(session.getId(), -1L);
+        boolean userAuthenticatedAndModerator = userService.findUserById(userId).isPresent()
+                && userService.findUserById(userId).get().isModerator();
         //if statistics is not public and user is not moderator throw exception
-        if (!globalSettingService.statisticsIsPublic() & !user.isModerator()) {
+        if (!globalSettingService.statisticsIsPublic() & !userAuthenticatedAndModerator) {
             throw new UserUnauthenticatedException();
         }
         return new ArrayList<>(postRepository.findAllOrderByTimeAsc());
