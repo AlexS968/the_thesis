@@ -5,6 +5,8 @@ import application.api.response.PostByIdResponse;
 import application.api.response.PostCommentResponse;
 import application.api.response.PostResponse;
 import application.api.response.PostsListResponse;
+import application.api.response.type.UserPostCommentResponse;
+import application.api.response.type.UserPostResponse;
 import application.exception.ApiValidationException;
 import application.exception.EntNotFoundException;
 import application.exception.UserUnauthenticatedException;
@@ -14,6 +16,9 @@ import application.repository.PostRepository;
 import application.service.LoginServiceImpl;
 import application.service.TagServiceImpl;
 import application.service.UserServiceImpl;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
@@ -26,16 +31,15 @@ import java.util.List;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class PostMapper {
-
     private final TagServiceImpl tagService;
     private final UserServiceImpl userService;
     private final PostRepository postRepository;
 
-    public PostMapper(TagServiceImpl tagService, UserServiceImpl userService, PostRepository postRepository) {
-        this.tagService = tagService;
-        this.userService = userService;
-        this.postRepository = postRepository;
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
     }
 
     public PostsListResponse convertToDto(int offset, int limit, List<Post> posts) {
@@ -50,17 +54,15 @@ public class PostMapper {
 
     public PostResponse convertToDto(Post post) {
         PostResponse response = new PostResponse();
-        response.setId(post.getId());
-        response.setTimestamp(post.getTime().toEpochSecond(ZoneOffset.ofHours(1)));
-        response.setUser();
-        response.setUserId(post.getUser().getId());
-        response.setUserName(post.getUser().getName());
-        response.setTitle(post.getTitle());
+        modelMapper().map(post, response);
+        UserPostResponse userResponse = new UserPostResponse();
+        modelMapper().map(post.getUser(), userResponse);
+        response.setUser(userResponse);
+        response.setTimestamp(post.getTime().toEpochSecond(ZoneOffset.ofHours(2)));
         response.setAnnounce(post.getText().substring(0, Math.min(post.getText().length(), 100)) + "...");
         response.setLikeCount(post.getLikesNumber());
         response.setDislikeCount(post.dislikeVotesNumber());
         response.setCommentCount(post.getPostComments().size());
-        response.setViewCount(post.getViewCount());
         return response;
     }
 
@@ -76,26 +78,21 @@ public class PostMapper {
         }
         //create new dto
         PostByIdResponse response = new PostByIdResponse();
-        response.setId(post.getId());
-        response.setTimestamp(post.getTime().toEpochSecond(ZoneOffset.ofHours(1)));
-        response.setActive(post.isActive());
-        response.setTitle(post.getTitle());
-        response.setText(post.getText());
+        modelMapper().map(post, response);
+        UserPostResponse userResponse = new UserPostResponse();
+        modelMapper().map(post.getUser(), userResponse);
+        response.setUser(userResponse);
+        response.setTimestamp(post.getTime().toEpochSecond(ZoneOffset.ofHours(2)));
         response.setLikeCount(post.getLikesNumber());
         response.setDislikeCount(post.dislikeVotesNumber());
-        response.setViewCount(post.getViewCount());
-        response.setUser();
-        response.setUserId(post.getUser().getId());
-        response.setUserName(post.getUser().getName());
 
         if (comments != null) {
             PostCommentResponse[] commentResponses = new PostCommentResponse[comments.size()];
             for (int i = 0; i < comments.size(); i++) {
                 User commentator = comments.get(i).getUser();
                 commentResponses[i] = new PostCommentResponse(comments.get(i).getId(),
-                        comments.get(i).getTime().toEpochSecond(ZoneOffset.ofHours(1)),
-                        comments.get(i).getText(), new PostCommentResponse
-                        .UserPostCommentResponse(commentator.getId(),
+                        comments.get(i).getTime().toEpochSecond(ZoneOffset.ofHours(2)),
+                        comments.get(i).getText(), new UserPostCommentResponse(commentator.getId(),
                         commentator.getName(), commentator.getPhoto()));
             }
             response.setComments(commentResponses);
@@ -129,7 +126,8 @@ public class PostMapper {
         post.setText(request.getText());
         post.setUser(user);
         //checking post time
-        LocalDateTime postTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(request.getTimestamp()), ZoneId.systemDefault());
+        LocalDateTime postTime = LocalDateTime.ofInstant(
+                Instant.ofEpochMilli(request.getTimestamp() * 1000), ZoneId.of("+02:00"));//+02:00
         postTime = postTime.isBefore(LocalDateTime.now()) ? LocalDateTime.now() : postTime;
         post.setTime(postTime);
         //setting tags to post

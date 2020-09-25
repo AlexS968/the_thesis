@@ -12,6 +12,7 @@ import application.mapper.StatisticsMapper;
 import application.mapper.TagMapper;
 import application.service.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +26,6 @@ import java.io.IOException;
 @RequestMapping(value = "/")
 @RequiredArgsConstructor
 public class ApiGeneralController {
-
-    private final InitServiceImpl initService;
     private final GlobalSettingServiceImpl globalSettingService;
     private final GlobalSettingMapper settingMapper;
     private final TagServiceImpl tagService;
@@ -40,15 +39,29 @@ public class ApiGeneralController {
     private final RegisterServiceImpl registerService;
     private final ImageServiceImpl imageService;
 
+    @Value("${blogInfo.title}")
+    String title;
+    @Value("${blogInfo.subtitle}")
+    String subtitle;
+    @Value("${blogInfo.phone}")
+    String phone;
+    @Value("${blogInfo.email}")
+    String email;
+    @Value("${blogInfo.copyright}")
+    String copyright;
+    @Value("${blogInfo.copyrightFrom}")
+    String copyrightFrom;
+
     @GetMapping(value = "api/init")
     public ResponseEntity<InitResponse> init() {
-        return initService.getInit();
+        return ResponseEntity.ok(
+                new InitResponse(title, subtitle, phone, email, copyright, copyrightFrom));
     }
 
     @GetMapping(value = "api/settings")
     public ResponseEntity<GlobalSettingResponse> getSettings() {
-        return new ResponseEntity<>(settingMapper.convertToDto(
-                globalSettingService.getGlobalSettings()), HttpStatus.OK);
+        return ResponseEntity.ok(settingMapper.convertToDto(
+                globalSettingService.getGlobalSettings()));
     }
 
     @PutMapping(value = "api/settings")
@@ -61,8 +74,8 @@ public class ApiGeneralController {
     @GetMapping(value = "api/tag")
     public ResponseEntity<TagsResponse> tags(
             @RequestParam(required = false) String query) {
-        return new ResponseEntity<>(tagMapper.convertToDto(tagService.getTags(query),
-                tagService.getWeights()), HttpStatus.OK);
+        return ResponseEntity.ok(tagMapper.convertToDto(tagService.getTags(query),
+                tagService.getWeights()));
     }
 
     @GetMapping(value = "api/calendar")

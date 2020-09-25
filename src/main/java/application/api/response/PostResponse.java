@@ -1,40 +1,16 @@
 package application.api.response;
 
-import lombok.AllArgsConstructor;
+import application.api.response.base.CountDataResponse;
+import application.api.response.type.UserPostResponse;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 
 @Data
-@NoArgsConstructor
-public class PostResponse {
-    private long id;
-    private long timestamp;
+@EqualsAndHashCode(callSuper = true)
+public class PostResponse extends CountDataResponse {
     private UserPostResponse user;
     private String title;
     private String announce;
-    private long likeCount;
-    private long dislikeCount;
     private int commentCount;
-    private int viewCount;
-
-    public void setUser() {
-        this.user = new UserPostResponse();
-    }
-
-    public void setUserId(long id) {
-        this.user.setId(id);
-    }
-
-    public void setUserName(String name) {
-        this.user.setName(name);
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    static class UserPostResponse {
-        private long id;
-        private String name;
-    }
 }
 

@@ -1,4 +1,4 @@
-package application.api.response;
+package application.api.response.base;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResultResponse {
-    private boolean result;
+public abstract class PostDataResponse {
+    private Long id;
+    private Long timestamp;
 }

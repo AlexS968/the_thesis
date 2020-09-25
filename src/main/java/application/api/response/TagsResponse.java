@@ -1,5 +1,6 @@
 package application.api.response;
 
+import application.api.response.type.TagResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,13 +10,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TagsResponse {
     private TagResponse[] tags;
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class TagResponse {
-        private String name;
-        private double weight;
-    }
 }
 

@@ -7,6 +7,7 @@ import application.api.response.PostsListResponse;
 import application.api.response.ResultResponse;
 import application.exception.EntNotFoundException;
 import application.mapper.PostMapper;
+import application.model.Post;
 import application.service.PostCommentServiceImpl;
 import application.service.PostServiceImpl;
 import application.service.PostVoteServiceImpl;

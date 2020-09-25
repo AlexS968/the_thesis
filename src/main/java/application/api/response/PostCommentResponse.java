@@ -1,24 +1,21 @@
 package application.api.response;
 
-import lombok.AllArgsConstructor;
+import application.api.response.base.PostDataResponse;
+import application.api.response.type.UserPostCommentResponse;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-public class PostCommentResponse {
-    private long id;
-    private long timestamp;
+@EqualsAndHashCode(callSuper = true)
+public class PostCommentResponse extends PostDataResponse {
     private String text;
     private UserPostCommentResponse user;
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class UserPostCommentResponse {
-        private long id;
-        private String name;
-        private String photo;
+    public PostCommentResponse(long id, long timestamp, String text, UserPostCommentResponse user) {
+        super(id, timestamp);
+        this.text = text;
+        this.user = user;
     }
 }

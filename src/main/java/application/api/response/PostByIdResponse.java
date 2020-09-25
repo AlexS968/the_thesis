@@ -1,34 +1,19 @@
 package application.api.response;
 
+import application.api.response.base.CountDataResponse;
+import application.api.response.type.UserPostResponse;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class PostByIdResponse {
-    private long id;
-    private long timestamp;
-    private boolean active;
-    private PostResponse.UserPostResponse user;
+@EqualsAndHashCode(callSuper = true)
+public class PostByIdResponse extends CountDataResponse {
+    @JsonProperty("active")
+    private boolean isActive;
+    private UserPostResponse user;
     private String title;
     private String text;
-    private long likeCount;
-    private long dislikeCount;
-    private int viewCount;
     private PostCommentResponse[] comments;
     private String[] tags;
-
-    public PostResponse.UserPostResponse getUser() {
-        return user;
-    }
-
-    public void setUser() {
-        this.user = new PostResponse.UserPostResponse();
-    }
-
-    public void setUserId(long id){
-        this.user.setId(id);
-    }
-
-    public void setUserName(String name){
-        this.user.setName(name);
-    }
 }

@@ -5,6 +5,7 @@ import application.api.request.*;
 import application.api.response.AuthenticationResponse;
 import application.api.response.CaptchaResponse;
 import application.api.response.ResultResponse;
+import application.api.response.type.UserAuthCheckResponse;
 import application.exception.apierror.ApiError;
 import application.exception.apierror.ApiValidationError;
 import application.mapper.CaptchaMapper;
@@ -56,16 +57,11 @@ public class ApiAuthControllerTest extends AbstractIntegrationTest {
         loginService.addSessionId(session.getId(), 1);
         User user = userRepository.findById(1L).get();
         //create response
-        AuthenticationResponse response = new AuthenticationResponse();
-        response.setResult(true);
-        response.setUser();
-        response.setUserId(user.getId());
-        response.setUserEmail(user.getEmail());
-        response.setUserName(user.getName());
-        response.setUserPhoto(user.getPhoto());
-        response.setUserSettings(false);
-        response.setUserModeration(user.isModerator());
-        response.setUserModerationCount(0);
+        UserAuthCheckResponse userResponse = new UserAuthCheckResponse(
+                user.getId(), user.getName(), user.getPhoto(), user.getEmail(),
+                user.isModerator(), 0, false
+        );
+        AuthenticationResponse response = new AuthenticationResponse(true, userResponse);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/auth/check")
                 .session(session))
@@ -241,14 +237,12 @@ public class ApiAuthControllerTest extends AbstractIntegrationTest {
         loginService.addSessionId(session.getId(), 1);
         User user = userRepository.findById(1L).get();
         LoginRequest request = new LoginRequest(user.getEmail(), user.getPassword());
-        AuthenticationResponse response = new AuthenticationResponse();
-        response.setResult(true);
-        response.setUser();
-        response.setUserId(user.getId());
-        response.setUserEmail(request.getEmail());
-        response.setUserName(user.getName());
-        response.setUserModeration(user.isModerator());
-        response.setUserSettings(false);
+        //create response
+        UserAuthCheckResponse userResponse = new UserAuthCheckResponse(
+                user.getId(), user.getName(), null, user.getEmail(),
+                user.isModerator(), 0, false
+        );
+        AuthenticationResponse response = new AuthenticationResponse(true, userResponse);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)

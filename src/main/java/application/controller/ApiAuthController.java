@@ -8,7 +8,6 @@ import application.api.response.AuthenticationResponse;
 import application.api.response.CaptchaResponse;
 import application.api.response.ResultResponse;
 import application.mapper.CaptchaMapper;
-import application.mapper.UserMapper;
 import application.model.CaptchaCode;
 import application.service.*;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +22,7 @@ import javax.validation.Valid;
 @RequestMapping(value = "/api/auth")
 @RequiredArgsConstructor
 public class ApiAuthController {
-
     private final UserServiceImpl userService;
-    private final UserMapper userMapper;
     private final LoginServiceImpl loginService;
     private final CaptchaServiceImpl captchaService;
     private final CaptchaMapper captchaMapper;
@@ -34,7 +31,7 @@ public class ApiAuthController {
 
     @GetMapping(value = "/check")
     public ResponseEntity<AuthenticationResponse> authCheck(HttpSession session) {
-        return new ResponseEntity<>(userMapper.convertToDto(session), HttpStatus.OK);
+        return new ResponseEntity<>(loginService.getAuthenticationResponse(session), HttpStatus.OK);
     }
 
     @GetMapping(value = "/captcha")
@@ -69,7 +66,7 @@ public class ApiAuthController {
     public ResponseEntity<AuthenticationResponse> login(
             @Valid @RequestBody LoginRequest request, HttpSession session) {
         loginService.userAuthentication(request, session);
-        return new ResponseEntity<>(userMapper.convertToDto(session), HttpStatus.OK);
+        return new ResponseEntity<>(loginService.getAuthenticationResponse(session), HttpStatus.OK);
     }
 
     @GetMapping("/logout")

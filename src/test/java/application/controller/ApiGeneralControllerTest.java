@@ -6,6 +6,7 @@ import application.api.request.ModerationRequest;
 import application.api.request.PostCommentRequest;
 import application.api.request.ProfileRequest;
 import application.api.response.*;
+import application.api.response.type.TagResponse;
 import application.exception.EntNotFoundException;
 import application.exception.apierror.ApiError;
 import application.exception.apierror.ApiValidationError;
@@ -45,7 +46,7 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
     @Autowired
     private LoginServiceImpl loginService;
     @Autowired
-    GlobalSettingRepository settingRepository;
+    private GlobalSettingRepository settingRepository;
     @MockBean
     ImageServiceImpl imageService;
 
@@ -58,13 +59,8 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
 
     @Test
     public void shouldInitialize() throws Exception {
-        InitResponse response = new InitResponse();
-        response.setTitle("DevPub");
-        response.setSubtitle("Program developer stories");
-        response.setPhone("+7 903 666-44-55");
-        response.setEmail("mail@mail.ru");
-        response.setCopyright("Dmitry Sergeev");
-        response.setCopyrightFrom("2005");
+        InitResponse response = new InitResponse("DevPub","Program developer stories",
+                "+7 903 666-44-55","mail@mail.ru","Dmitry Sergeev","2005");
         mockMvc.perform(MockMvcRequestBuilders.get("/api/init"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(
@@ -116,8 +112,8 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
     @Test
     public void shouldGetAllTagsWithWeights() throws Exception {
         //create response
-        TagsResponse.TagResponse[] tags = {new TagsResponse.TagResponse("java", 1.0),
-                new TagsResponse.TagResponse("spring", 2.0 / 3.0)};
+        TagResponse[] tags = {new TagResponse("java", 1.0),
+                new TagResponse("spring", 2.0 / 3.0)};
         TagsResponse response = new TagsResponse(tags);
         mockMvc.perform(MockMvcRequestBuilders.get("/api/tag"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -128,7 +124,7 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
     @Test
     public void shouldGetTagsWithWeightsBySearch() throws Exception {
         //create response
-        TagsResponse.TagResponse[] tags = {new TagsResponse.TagResponse("java", 1.0)};
+        TagResponse[] tags = {new TagResponse("java", 1.0)};
         TagsResponse response = new TagsResponse(tags);
         mockMvc.perform(MockMvcRequestBuilders.get("/api/tag")
                 .param("query", "ja"))
@@ -158,9 +154,9 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
         //create response
         StatisticsResponse response = new StatisticsResponse();
         response.setPostsCount(4);
-        response.setLikesCount(4);
-        response.setDislikesCount(1);
-        response.setViewsCount(22);
+        response.setLikeCount(4);
+        response.setDislikeCount(1);
+        response.setViewCount(22);
         LocalDateTime time = LocalDateTime
                 .of(2019, 10, 2, 10, 23, 54);
         response.setFirstPublication(time.toEpochSecond(ZoneOffset.ofHours(1)));
@@ -191,9 +187,9 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
         //create response
         StatisticsResponse response = new StatisticsResponse();
         response.setPostsCount(2);
-        response.setLikesCount(2);
-        response.setDislikesCount(0);
-        response.setViewsCount(11);
+        response.setLikeCount(2);
+        response.setDislikeCount(0);
+        response.setViewCount(11);
         LocalDateTime time = LocalDateTime //2020-08-04 10:23:54
                 .of(2019, 10, 2, 10, 23, 54);
         response.setFirstPublication(time.toEpochSecond(ZoneOffset.ofHours(1)));

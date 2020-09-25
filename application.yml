@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:${DATABASE_URL:postgresql://localhost:5432/myblog}
+    url: jdbc:${DATABASE_URL:postgresql://localhost:5432/myblog?serverTimezone=UTC}
     username: postgres
     password:
     driver-class-name: org.postgresql.Driver
@@ -27,6 +27,15 @@ appEmail:
   email: javaentwickler20@gmail.com
 
 captchaExpirationTime: 1
+
+blogInfo:
+  title: "DevPub"
+  subtitle: "Program developer stories"
+  phone: "+7 903 666-44-55"
+  email: "mail@mail.ru"
+  copyright: "Dmitry Sergeev"
+  copyrightFrom: "2005"
+
 
 
 

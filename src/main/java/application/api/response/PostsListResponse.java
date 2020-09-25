@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostsListResponse {
-    int count;
+    private int count;
     private PostResponse[] posts;
 }
