@@ -1,4 +1,4 @@
-package application.repository;
+package application.model.repository;
 
 public interface IPostCount {
     String getName();

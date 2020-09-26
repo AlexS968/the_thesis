@@ -1,28 +1,28 @@
 package application.service;
 
-import application.exception.EntNotFoundException;
-import application.exception.UserUnauthenticatedException;
 import application.model.Post;
 import application.model.PostVote;
 import application.model.User;
-import application.repository.PostVoteRepository;
+import application.model.repository.PostVoteRepository;
+import application.model.repository.UserRepository;
 import application.service.interfaces.PostVoteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpSession;
+import java.security.Principal;
 import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class PostVoteServiceImpl implements PostVoteService {
     private final PostVoteRepository postVoteRepository;
-    private final UserServiceImpl userService;
+    private final UserRepository userRepository;
 
     @Override
-    public boolean like(Post post, HttpSession session, boolean like) {
-        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(UserUnauthenticatedException::new);
+    public boolean like(Post post, Principal principal, boolean like) {
+        User user = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(principal.getName()));
         PostVote postVote = postVoteRepository.findByPostIdAndByUserId(post.getId(), user.getId())
                 .orElse(null);
         if (postVote == null) {

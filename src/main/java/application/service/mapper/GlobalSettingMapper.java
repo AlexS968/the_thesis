@@ -1,4 +1,4 @@
-package application.mapper;
+package application.service.mapper;
 
 import application.api.request.GlobalSettingRequest;
 import application.api.response.GlobalSettingResponse;

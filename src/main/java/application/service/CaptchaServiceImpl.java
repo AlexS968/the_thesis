@@ -1,7 +1,7 @@
 package application.service;
 
 import application.model.CaptchaCode;
-import application.repository.CaptchaCodeRepository;
+import application.model.repository.CaptchaCodeRepository;
 import application.service.interfaces.CaptchaService;
 import com.github.cage.YCage;
 import lombok.RequiredArgsConstructor;

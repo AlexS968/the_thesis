@@ -1,8 +1,8 @@
 package application.service;
 
 import application.model.Post;
-import application.repository.IPostCount;
-import application.repository.PostRepository;
+import application.model.repository.IPostCount;
+import application.model.repository.PostRepository;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

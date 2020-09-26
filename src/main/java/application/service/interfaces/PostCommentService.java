@@ -1,9 +1,10 @@
 package application.service.interfaces;
 
 import application.api.request.PostCommentRequest;
+import application.api.response.CommentResponse;
 import application.model.PostComment;
 
-import javax.servlet.http.HttpSession;
+import java.security.Principal;
 import java.util.List;
 
 public interface PostCommentService {
@@ -12,5 +13,5 @@ public interface PostCommentService {
 
     PostComment getCommentById(long id);
 
-    long addPostComment(PostCommentRequest request, HttpSession session);
+    CommentResponse addPostComment(PostCommentRequest request, Principal principal);
 }

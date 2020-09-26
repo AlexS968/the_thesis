@@ -1,1 +1,76 @@
 2020-09-24 22:08:00.078 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.UserUnauthenticatedException, null
+2020-09-25 10:01:46.172 [main] ERROR application.exception.GlobalExceptionHandler              - application.exception.UserUnauthenticatedException, null
+2020-09-25 12:23:57.338 [http-nio-8080-exec-6] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 12:24:43.052 [http-nio-8080-exec-10] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 12:28:29.209 [http-nio-8080-exec-1] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 12:32:05.761 [http-nio-8080-exec-3] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 12:32:17.997 [http-nio-8080-exec-4] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 12:52:10.344 [http-nio-8080-exec-1] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 13:04:22.121 [http-nio-8080-exec-1] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 13:05:38.513 [http-nio-8080-exec-1] ERROR application.exception.GlobalExceptionHandler              - [Ljava.lang.StackTraceElement;@d672cba
+2020-09-25 13:07:28.138 [http-nio-8080-exec-2] ERROR application.exception.GlobalExceptionHandler              - [Ljava.lang.StackTraceElement;@61b8b4e6
+2020-09-25 13:11:48.339 [http-nio-8080-exec-2] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 13:11:59.651 [http-nio-8080-exec-4] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 13:14:24.265 [http-nio-8080-exec-1] ERROR application.exception.GlobalExceptionHandler              - 500 Zugriff verweigert
+2020-09-25 13:17:31.394 [http-nio-8080-exec-2] ERROR application.exception.GlobalExceptionHandler              - 500 Zugriff verweigert
+2020-09-25 13:20:21.143 [http-nio-8080-exec-2] ERROR application.exception.GlobalExceptionHandler              - 403 Zugriff verweigert
+2020-09-25 13:46:12.296 [http-nio-8080-exec-5] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 13:49:22.168 [http-nio-8080-exec-8] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 13:49:25.147 [http-nio-8080-exec-7] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 13:51:53.284 [http-nio-8080-exec-5] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 13:52:11.987 [http-nio-8080-exec-3] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 13:52:21.689 [http-nio-8080-exec-6] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 13:52:28.536 [http-nio-8080-exec-3] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 13:56:50.992 [http-nio-8080-exec-6] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 13:59:57.805 [http-nio-8080-exec-1] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 14:06:29.444 [http-nio-8080-exec-7] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 14:11:50.477 [http-nio-8080-exec-3] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 14:21:58.404 [http-nio-8080-exec-9] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 14:22:59.252 [http-nio-8080-exec-2] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 14:23:46.073 [http-nio-8080-exec-1] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 14:34:34.058 [http-nio-8080-exec-4] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 14:34:52.996 [http-nio-8080-exec-3] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 14:35:17.488 [http-nio-8080-exec-10] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 14:38:05.389 [http-nio-8080-exec-7] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 14:38:20.836 [http-nio-8080-exec-8] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 14:41:32.856 [http-nio-8080-exec-2] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 14:56:00.809 [http-nio-8080-exec-3] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 14:59:20.642 [http-nio-8080-exec-1] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-25 15:00:46.080 [http-nio-8080-exec-5] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-26 10:41:50.863 [http-nio-8080-exec-1] ERROR application.exception.GlobalExceptionHandler              - Optional int parameter 'year' is present but cannot be translated into a null value due to being declared as a primitive type. Consider declaring it as object wrapper for the corresponding primitive type.
+2020-09-26 10:46:36.039 [http-nio-8080-exec-7] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-26 10:54:06.694 [http-nio-8080-exec-7] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-26 10:56:09.610 [http-nio-8080-exec-3] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-26 10:58:05.639 [http-nio-8080-exec-10] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-26 10:58:41.671 [http-nio-8080-exec-7] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-26 11:00:03.164 [http-nio-8080-exec-10] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-26 11:00:09.542 [http-nio-8080-exec-6] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-26 11:02:13.854 [http-nio-8080-exec-1] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-26 11:02:18.881 [http-nio-8080-exec-7] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-26 11:03:30.914 [http-nio-8080-exec-1] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-26 11:04:22.572 [http-nio-8080-exec-2] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-26 11:11:01.628 [http-nio-8080-exec-5] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-26 11:11:32.230 [http-nio-8080-exec-5] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-26 11:12:18.525 [http-nio-8080-exec-8] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-26 11:12:34.268 [http-nio-8080-exec-7] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-26 11:12:35.451 [http-nio-8080-exec-1] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-26 11:14:49.238 [http-nio-8080-exec-6] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-26 11:14:59.203 [http-nio-8080-exec-10] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-26 11:16:25.668 [http-nio-8080-exec-7] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-26 11:16:37.110 [http-nio-8080-exec-1] ERROR application.exception.GlobalExceptionHandler              - Zugriff verweigert
+2020-09-26 16:17:15.560 [main] ERROR org.springframework.boot.diagnostics.LoggingFailureAnalysisReporter              - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 6 of constructor in application.controller.ApiAuthController required a bean of type 'org.springframework.security.authentication.AuthenticationManager' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'org.springframework.security.authentication.AuthenticationManager' in your configuration.
+
+2020-09-26 17:21:36.857 [http-nio-8080-exec-9] ERROR application.exception.GlobalExceptionHandler              - application.exception.UserUnauthenticatedException, null

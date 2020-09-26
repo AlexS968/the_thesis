@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -20,14 +21,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {EntNotFoundException.class})
     protected ResponseEntity<ApiError> handleEntityNotFoundException(
             EntNotFoundException ex, WebRequest req) {
-        logger.error(ex.getClass().getName()+ ", " + ex.getMessage());
+        logger.error(ex.getClass().getName() + ", " + ex.getMessage());
         return handleExceptionInternal(ex, null, HttpStatus.NOT_FOUND, req);
     }
 
     @ExceptionHandler(value = {UserUnauthenticatedException.class})
     protected ResponseEntity<ApiError> handleUserNotAuthorizedException(
             UserUnauthenticatedException ex, WebRequest req) {
-        logger.error(ex.getClass().getName()+ ", " + ex.getMessage());
+        logger.error(ex.getClass().getName() + ", " + ex.getMessage());
         return handleExceptionInternal(ex, null, HttpStatus.UNAUTHORIZED, req);
     }
 
@@ -45,12 +46,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, ex.getError(), HttpStatus.BAD_REQUEST, req);
     }
 
-    @ExceptionHandler(value = {Exception.class})
+/*    @ExceptionHandler(value = {AccessDeniedException.class})
+    protected ResponseEntity<ApiError> handleAccessDeniedExceptionException(
+            Exception ex, WebRequest req) {
+        logger.error(ex.getMessage());
+        ex.printStackTrace();
+        return handleExceptionInternal(ex, null, HttpStatus.UNAUTHORIZED, req);
+    }*/
+
+/*    @ExceptionHandler(value = {Exception.class})
     protected ResponseEntity<ApiError> handleGenericException(
             Exception ex, WebRequest req) {
         logger.error(ex.getMessage());
+        System.out.println("**********************************************");
+        ex.printStackTrace();
         return handleExceptionInternal(ex, null, HttpStatus.INTERNAL_SERVER_ERROR, req);
-    }
+    }*/
 
     protected ResponseEntity<ApiError> handleExceptionInternal(
             Exception ex, ApiError body, HttpStatus status, WebRequest request) {

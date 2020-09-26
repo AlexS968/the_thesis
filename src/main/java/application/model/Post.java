@@ -1,5 +1,6 @@
 package application.model;
 
+import application.model.enums.ModerationStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

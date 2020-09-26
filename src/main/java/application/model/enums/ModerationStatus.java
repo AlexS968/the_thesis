@@ -1,4 +1,4 @@
-package application.model;
+package application.model.enums;
 
 //post moderation status
 public enum ModerationStatus {

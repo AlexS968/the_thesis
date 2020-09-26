@@ -1,13 +1,16 @@
 package application.service;
 
 import application.api.request.ChangePasswordRequest;
+import application.api.request.PasswordRestoreRequest;
+import application.api.response.ResultResponse;
 import application.exception.ApiValidationException;
 import application.exception.apierror.ApiValidationError;
 import application.model.User;
-import application.repository.CaptchaCodeRepository;
-import application.repository.UserRepository;
+import application.model.repository.CaptchaCodeRepository;
+import application.model.repository.UserRepository;
 import application.service.interfaces.PasswordService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,9 +18,10 @@ import org.springframework.stereotype.Service;
 public class PasswordServiceImpl implements PasswordService {
     private final UserRepository userRepository;
     private final CaptchaCodeRepository captchaCodeRepository;
+    private final SendGridMailServiceImpl sendGridMailService;
 
     @Override
-    public void changePassword(ChangePasswordRequest request) {
+    public ResultResponse changePassword(ChangePasswordRequest request) {
         ApiValidationError apiValidationError = new ApiValidationError();
         boolean throwException = false;
         //check password recovery link
@@ -45,5 +49,19 @@ public class PasswordServiceImpl implements PasswordService {
             user.setPassword(request.getPassword());
             userRepository.save(user);
         }
+        return new ResultResponse(true);
+    }
+
+    @Override
+    public ResultResponse restorePassword(PasswordRestoreRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new ApiValidationException("There is no such email"));
+        String restoreCode = RandomStringUtils.randomAlphanumeric(45);
+        user.setCode(restoreCode);
+        userRepository.save(user);
+        // send link by email
+        sendGridMailService.sendMail(request.getEmail(), "Password restore link to the DevPub blog",
+                "https://sablin-java-skillbox.herokuapp.com/login/change-password/" + restoreCode);
+        return new ResultResponse(true);
     }
 }

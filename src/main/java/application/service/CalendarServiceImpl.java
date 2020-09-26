@@ -1,7 +1,7 @@
 package application.service;
 
 import application.exception.EntNotFoundException;
-import application.repository.PostRepository;
+import application.model.repository.PostRepository;
 import application.service.interfaces.CalendarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

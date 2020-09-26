@@ -1,18 +1,17 @@
 package application.service.interfaces;
 
 import application.api.request.RegisterRequest;
-import application.model.User;
+import application.api.response.ResultResponse;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
+import java.security.Principal;
 
 public interface RegisterService {
 
-    void createUser(RegisterRequest request);
+    ResultResponse createUser(RegisterRequest request);
 
-    void changeProfile(MultipartFile file, Integer removePhoto, String password,
-                       String name, String email, HttpSession session) throws Exception;
+    ResultResponse changeProfile(MultipartFile file, Integer removePhoto, String password,
+                                 String name, String email, Principal principal) throws Exception;
 
     boolean checkCaptcha(String code, String secretCode);
 }

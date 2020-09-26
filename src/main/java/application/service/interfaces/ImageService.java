@@ -1,12 +1,11 @@
 package application.service.interfaces;
 
-import application.model.User;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.security.Principal;
 
 public interface ImageService {
 
-    String uploadImage(MultipartFile file, HttpSession session) throws IOException;
+    String uploadImage(MultipartFile file, Principal principal) throws IOException;
 }

@@ -3,21 +3,23 @@ package application.service;
 import application.api.request.LikeRequest;
 import application.api.request.ModerationRequest;
 import application.api.request.PostRequest;
+import application.api.response.ResultResponse;
 import application.exception.ApiValidationException;
 import application.exception.BadRequestException;
 import application.exception.EntNotFoundException;
-import application.exception.UserUnauthenticatedException;
 import application.exception.apierror.ApiValidationError;
-import application.model.ModerationStatus;
 import application.model.Post;
 import application.model.TagToPost;
 import application.model.User;
-import application.repository.PostRepository;
+import application.model.enums.ModerationStatus;
+import application.model.repository.PostRepository;
+import application.model.repository.UserRepository;
 import application.service.interfaces.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpSession;
+import java.security.Principal;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -29,7 +31,7 @@ import java.util.*;
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final TagServiceImpl tagService;
-    private final UserServiceImpl userService;
+    private final UserRepository userRepository;
 
     @Override
     public List<Post> getPosts() {
@@ -89,9 +91,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> getMyPosts(HttpSession session, String status) {
-        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(UserUnauthenticatedException::new);
+    public List<Post> getMyPosts(Principal principal, String status) {
+        User user = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(principal.getName()));
         boolean isActive;
         String moderationStatus;
         switch (status) {
@@ -121,9 +123,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> getPostsForModeration(HttpSession session, String status) {
-        User moderator = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(UserUnauthenticatedException::new);
+    public List<Post> getPostsForModeration(String email, String status) {
+        User moderator = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(email));
         List<Post> result;
         switch (status) {
             case "new":
@@ -145,6 +147,7 @@ public class PostServiceImpl implements PostService {
         return result;
     }
 
+/*    @Override
     public int getModerationCounter(HttpSession session) {
         User moderator = userService.findUserById(LoginServiceImpl.getSessionsId()
                 .get(session.getId())).orElseThrow(UserUnauthenticatedException::new);
@@ -162,26 +165,23 @@ public class PostServiceImpl implements PostService {
                             true, moderator.getId(), "ACCEPTED").size();
         }
         return result;
-    }
+    }*/
 
     @Override
-    public boolean moderatePost(ModerationRequest request, HttpSession session) {
+    public ResultResponse moderatePost(ModerationRequest request, Principal principal) {
         boolean result = false;
-        Long userId = LoginServiceImpl.getSessionsId().get(session.getId());
-        if (userId != null) {
-            User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                    .get(session.getId())).orElseThrow(EntNotFoundException::new);
-            if (user.isModerator()) {
-                Post post = postRepository.findById(request.getPostId())
-                        .orElseThrow(EntNotFoundException::new);
-                post.setModerator(user);
-                post.setModerationStatus(request.getDecision().equals("accept") ?
-                        ModerationStatus.ACCEPTED : ModerationStatus.DECLINED);
-                postRepository.save(post);
-                result = true;
-            }
+        User user = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException("principal.getName()"));
+        if (user.isModerator()) {
+            Post post = postRepository.findById(request.getPostId())
+                    .orElseThrow(EntNotFoundException::new);
+            post.setModerator(user);
+            post.setModerationStatus(request.getDecision().equals("accept") ?
+                    ModerationStatus.ACCEPTED : ModerationStatus.DECLINED);
+            postRepository.save(post);
+            result = true;
         }
-        return result;
+        return new ResultResponse(result);
     }
 
     @Override
@@ -196,13 +196,15 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post savePost(Post post) {
-        return postRepository.save(post);
+    public ResultResponse savePost(Post post) {
+        postRepository.save(post);
+        return new ResultResponse(true);
     }
 
-    public Post updatePost(long postId, PostRequest request, HttpSession session) {
-        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(UserUnauthenticatedException::new);
+    @Override
+    public Post updatePost(long postId, PostRequest request, Principal principal) {
+        User user = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(principal.getName()));
         Post post = postRepository.findById(postId).orElseThrow(EntNotFoundException::new);
         boolean throwException = false;
         ApiValidationError error = new ApiValidationError();

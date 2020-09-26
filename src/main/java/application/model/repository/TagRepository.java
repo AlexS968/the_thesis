@@ -1,4 +1,4 @@
-package application.repository;
+package application.model.repository;
 
 import application.model.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;

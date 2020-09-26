@@ -1,11 +1,10 @@
 package application.service.interfaces;
 
 import application.model.Post;
-import application.model.User;
 
-import javax.servlet.http.HttpSession;
+import java.security.Principal;
 
 public interface PostVoteService {
 
-    boolean like(Post post, HttpSession session, boolean like);
+    boolean like(Post post, Principal principal, boolean like);
 }

@@ -2,29 +2,28 @@ package application.service;
 
 import application.api.request.LoginRequest;
 import application.api.response.AuthenticationResponse;
+import application.api.response.ResultResponse;
 import application.api.response.type.UserAuthCheckResponse;
-import application.exception.EntNotFoundException;
-import application.model.User;
-import application.repository.UserRepository;
+import application.model.repository.UserRepository;
 import application.service.interfaces.LoginService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.security.Principal;
 
 @Service
 @RequiredArgsConstructor
 public class LoginServiceImpl implements LoginService {
     private final UserRepository userRepository;
     private final PostServiceImpl postService;
-
-    //sessions id
-    private static final Map<String, Long> sessionsId = new HashMap<>();
+    private final AuthenticationManager authenticationManager;
 
     @Bean
     public ModelMapper authModelMapper() {
@@ -32,44 +31,36 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public void userAuthentication(LoginRequest request, HttpSession session) {
-        Optional<User> user = userRepository.findByEmail(request.getEmail());
-        if (user.isPresent()) {
-            if (user.get().getPassword().equals(request.getPassword())) {
-                sessionsId.put(session.getId(), user.get().getId());
-            }
-        }
+    public AuthenticationResponse check(Principal principal) {
+        return principal != null ?
+                getAuthenticationResponse(principal.getName()) :
+                new AuthenticationResponse(false);
     }
 
     @Override
-    public AuthenticationResponse getAuthenticationResponse(HttpSession session) {
-        AuthenticationResponse response;
-        Long userId = LoginServiceImpl.getSessionsId().get(session.getId());
-        if (userId == null) {
-            response = new AuthenticationResponse(false);
-        } else {
-            User user = userRepository.findById(userId)
-                    .orElseThrow(EntNotFoundException::new);
-            UserAuthCheckResponse userResponse = new UserAuthCheckResponse();
-            authModelMapper().map(user, userResponse);
-            userResponse.setModerationCount(!user.isModerator() ?
-                    0 : postService.getPostsForModeration(session, "new").size());
-            response = new AuthenticationResponse(true, userResponse);
-        }
-        return response;
+    public AuthenticationResponse login(LoginRequest request) {
+        Authentication auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        org.springframework.security.core.userdetails.User user =
+                (org.springframework.security.core.userdetails.User) auth.getPrincipal();
+        return getAuthenticationResponse(user.getUsername());
     }
 
     @Override
-    public void logout(HttpSession session) {
-        sessionsId.remove(session.getId());
+    public ResultResponse logout(Principal principal) {
+        SecurityContextHolder.getContext().setAuthentication(null);
+        return new ResultResponse(true);
     }
 
-    @Override
-    public void addSessionId(String sessionId, long userId) {
-        sessionsId.put(sessionId, userId);
-    }
-
-    public static Map<String, Long> getSessionsId() {
-        return sessionsId;
+    private AuthenticationResponse getAuthenticationResponse(String email) {
+        application.model.User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(email));
+        UserAuthCheckResponse userResponse = new UserAuthCheckResponse();
+        authModelMapper().map(user, userResponse);
+        userResponse.setModerationCount(2);
+        userResponse.setModerationCount(!user.isModerator() ?
+                0 : postService.getPostsForModeration(email, "new").size());
+        return new AuthenticationResponse(true, userResponse);
     }
 }

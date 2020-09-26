@@ -1,20 +1,23 @@
 package application.service;
 
 import application.api.request.PostCommentRequest;
+import application.api.response.CommentResponse;
 import application.exception.ApiValidationException;
 import application.exception.BadRequestException;
 import application.exception.EntNotFoundException;
-import application.exception.UserUnauthenticatedException;
 import application.exception.apierror.ApiValidationError;
 import application.model.Post;
 import application.model.PostComment;
 import application.model.User;
-import application.repository.PostCommentRepository;
+import application.model.repository.PostCommentRepository;
+import application.model.repository.PostRepository;
+import application.model.repository.UserRepository;
 import application.service.interfaces.PostCommentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpSession;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,8 +25,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostCommentServiceImpl implements PostCommentService {
     private final PostCommentRepository postCommentRepository;
-    private final PostServiceImpl postService;
-    private final UserServiceImpl userService;
+    private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
     @Override
     public List<PostComment> getTagsToPost(long id) {
@@ -36,15 +39,11 @@ public class PostCommentServiceImpl implements PostCommentService {
     }
 
     @Override
-    public long addPostComment(PostCommentRequest request, HttpSession session) {
-        //check authentication
-        if (LoginServiceImpl.getSessionsId().get(session.getId()) == null) {
-            throw new UserUnauthenticatedException();
-        }
-        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(EntNotFoundException::new);
+    public CommentResponse addPostComment(PostCommentRequest request, Principal principal) {
+        User user = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(principal.getName()));
         //get post or throw BadRequestException
-        Post post = postService.getPostByID(request.getPostId())
+        Post post = postRepository.findById(request.getPostId())
                 .orElseThrow(BadRequestException::new);
         //get parent comment, or if comment with this number don't exist, throw BadRequestException
         PostComment parentComment = request.getParentId() != null ? postCommentRepository
@@ -61,6 +60,6 @@ public class PostCommentServiceImpl implements PostCommentService {
         //create and save new comment
         PostComment comment = postCommentRepository.save(new PostComment(
                 parentComment, post, user, LocalDateTime.now(), request.getText()));
-        return comment.getId();
+        return new CommentResponse(comment.getId());
     }
 }

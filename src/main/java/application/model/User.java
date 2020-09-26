@@ -1,8 +1,10 @@
 package application.model;
 
+import application.model.enums.Role;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -12,6 +14,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 @Entity
 @Table(name = "users")
 public class User {
@@ -42,6 +45,10 @@ public class User {
     private Set<PostVote> postVotes;
     @OneToMany(mappedBy = "user")
     private Set<PostComment> postComments;
+
+    public Role getRole() {
+        return isModerator ? Role.MODERATOR : Role.USER;
+    }
 
     public User(@NotBlank String name, @NotBlank String email, @NotBlank String password, LocalDateTime regTime, boolean isModerator) {
         this.isModerator = isModerator;

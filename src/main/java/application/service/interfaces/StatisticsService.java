@@ -2,12 +2,12 @@ package application.service.interfaces;
 
 import application.model.Post;
 
-import javax.servlet.http.HttpSession;
+import java.security.Principal;
 import java.util.List;
 
 public interface StatisticsService {
 
-    List<Post> getAllPostsOrderByTimeAsc(HttpSession session);
+    List<Post> getAllPostsOrderByTimeAsc(Principal principal);
 
-    List<Post> getAllPostsByUserIdOrderByTimeAsc(HttpSession session);
+    List<Post> getAllPostsByUserIdOrderByTimeAsc(Principal principal);
 }

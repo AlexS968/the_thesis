@@ -1,4 +1,4 @@
-package application.mapper;
+package application.service.mapper;
 
 import application.api.request.PostRequest;
 import application.api.response.PostByIdResponse;
@@ -8,20 +8,22 @@ import application.api.response.PostsListResponse;
 import application.api.response.type.UserPostCommentResponse;
 import application.api.response.type.UserPostResponse;
 import application.exception.ApiValidationException;
-import application.exception.EntNotFoundException;
-import application.exception.UserUnauthenticatedException;
 import application.exception.apierror.ApiValidationError;
-import application.model.*;
-import application.repository.PostRepository;
-import application.service.LoginServiceImpl;
+import application.model.Post;
+import application.model.PostComment;
+import application.model.TagToPost;
+import application.model.User;
+import application.model.enums.ModerationStatus;
+import application.model.repository.PostRepository;
+import application.model.repository.UserRepository;
 import application.service.TagServiceImpl;
-import application.service.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpSession;
+import java.security.Principal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -34,8 +36,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class PostMapper {
     private final TagServiceImpl tagService;
-    private final UserServiceImpl userService;
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
     @Bean
     public ModelMapper modelMapper() {
@@ -67,12 +69,10 @@ public class PostMapper {
     }
 
     public PostByIdResponse convertToDto(
-            Post post, List<String> tags, List<PostComment> comments, HttpSession session) {
-        Long userId = LoginServiceImpl.getSessionsId().get(session.getId());
-        User user = (userId != null) ? userService.findUserById(userId)
-                .orElseThrow(EntNotFoundException::new) : null;
+            Post post, List<String> tags, List<PostComment> comments, Principal principal) {
+        User user = userRepository.findByEmail(principal.getName()).orElse(null);
         //increase view counter under certain conditions
-        if (userId == null || (!user.isModerator() & post.getUser().getId() != userId)) {
+        if (user == null || (!user.isModerator() & post.getUser().getId() != user.getId())) {
             post.setViewCount(post.getViewCount() + 1);
             postRepository.save(post);
         }
@@ -101,9 +101,9 @@ public class PostMapper {
         return response;
     }
 
-    public Post convertToEntity(PostRequest request, HttpSession session) {
-        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(UserUnauthenticatedException::new);
+    public Post convertToEntity(PostRequest request, Principal principal) {
+        User user = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(principal.getName()));
         //check post title and text
         ApiValidationError apiValidationError = new ApiValidationError();
         boolean throwException = false;

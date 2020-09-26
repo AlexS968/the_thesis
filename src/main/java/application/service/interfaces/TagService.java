@@ -3,7 +3,7 @@ package application.service.interfaces;
 import application.model.Post;
 import application.model.Tag;
 import application.model.TagToPost;
-import application.repository.IPostCount;
+import application.model.repository.IPostCount;
 
 import java.util.List;
 

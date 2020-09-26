@@ -1,4 +1,4 @@
-package application.mapper;
+package application.service.mapper;
 
 import application.api.response.CalendarResponse;
 import org.springframework.stereotype.Service;

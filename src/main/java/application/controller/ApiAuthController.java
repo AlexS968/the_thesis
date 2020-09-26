@@ -7,71 +7,64 @@ import application.api.request.RegisterRequest;
 import application.api.response.AuthenticationResponse;
 import application.api.response.CaptchaResponse;
 import application.api.response.ResultResponse;
-import application.mapper.CaptchaMapper;
 import application.model.CaptchaCode;
+import application.model.repository.UserRepository;
 import application.service.*;
+import application.service.mapper.CaptchaMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.security.Principal;
 
 @RestController
 @RequestMapping(value = "/api/auth")
 @RequiredArgsConstructor
 public class ApiAuthController {
-    private final UserServiceImpl userService;
     private final LoginServiceImpl loginService;
     private final CaptchaServiceImpl captchaService;
-    private final CaptchaMapper captchaMapper;
     private final RegisterServiceImpl registerService;
     private final PasswordServiceImpl passwordService;
+    private final CaptchaMapper captchaMapper;
 
     @GetMapping(value = "/check")
-    public ResponseEntity<AuthenticationResponse> authCheck(HttpSession session) {
-        return new ResponseEntity<>(loginService.getAuthenticationResponse(session), HttpStatus.OK);
+    public ResponseEntity<AuthenticationResponse> authCheck(Principal principal) {
+        return ResponseEntity.ok(loginService.check(principal));
     }
 
     @GetMapping(value = "/captcha")
     public ResponseEntity<CaptchaResponse> captcha() throws Exception {
         CaptchaCode captchaCode = captchaService.captchaGenerator();
-        return new ResponseEntity<>(captchaMapper.convertToDto(
-                captchaCode, captchaService.conversionToBase64(captchaCode)), HttpStatus.OK);
+        return ResponseEntity.ok(captchaMapper.convertToDto(
+                captchaCode, captchaService.conversionToBase64(captchaCode)));
     }
 
     @PostMapping("/restore")
     public ResponseEntity<ResultResponse> restorePassword(
             @Valid @RequestBody PasswordRestoreRequest request) {
-        userService.restorePassword(request);
-        return new ResponseEntity<>(new ResultResponse(true), HttpStatus.OK);
+        return ResponseEntity.ok(passwordService.restorePassword(request));
     }
 
     @PostMapping("/password")
     public ResponseEntity<ResultResponse> changePassword(
             @Valid @RequestBody ChangePasswordRequest request) {
-        passwordService.changePassword(request);
-        return new ResponseEntity<>(new ResultResponse(true), HttpStatus.OK);
+        return ResponseEntity.ok(passwordService.changePassword(request));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ResultResponse> register(
-            @Valid @RequestBody RegisterRequest request) {
-        registerService.createUser(request);
-        return new ResponseEntity<>(new ResultResponse(true), HttpStatus.OK);
+    public ResponseEntity<ResultResponse> register(@Valid @RequestBody RegisterRequest request) {
+        return ResponseEntity.ok(registerService.createUser(request));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(
-            @Valid @RequestBody LoginRequest request, HttpSession session) {
-        loginService.userAuthentication(request, session);
-        return new ResponseEntity<>(loginService.getAuthenticationResponse(session), HttpStatus.OK);
+    public ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody LoginRequest request) {
+        return ResponseEntity.ok(loginService.login(request));
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<ResultResponse> logout(HttpSession session) {
-        loginService.logout(session);
-        return new ResponseEntity<>(new ResultResponse(true), HttpStatus.OK);
+    public ResponseEntity<ResultResponse> logout(Principal principal) {
+        return ResponseEntity.ok(loginService.logout(principal));
     }
 }

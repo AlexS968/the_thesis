@@ -6,19 +6,17 @@ import application.api.response.PostByIdResponse;
 import application.api.response.PostsListResponse;
 import application.api.response.ResultResponse;
 import application.exception.EntNotFoundException;
-import application.mapper.PostMapper;
-import application.model.Post;
 import application.service.PostCommentServiceImpl;
 import application.service.PostServiceImpl;
 import application.service.PostVoteServiceImpl;
 import application.service.TagServiceImpl;
+import application.service.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.security.Principal;
 
 @RestController
 @RequestMapping(value = "/api/post")
@@ -33,88 +31,79 @@ public class ApiPostController {
 
     @GetMapping(value = "")
     public ResponseEntity<PostsListResponse> allPosts(
-            @RequestParam int offset, @RequestParam int limit,
-            @RequestParam String mode) {
-        return new ResponseEntity<>(postMapper.convertToDto(offset, limit,
-                postService.getSortedPosts(mode)), HttpStatus.OK);
+            @RequestParam int offset, @RequestParam int limit, @RequestParam String mode) {
+        return ResponseEntity.ok(postMapper.convertToDto(offset, limit,
+                postService.getSortedPosts(mode)));
     }
 
     @GetMapping(value = "/search")
     public ResponseEntity<PostsListResponse> postsOnQuery(
-            @RequestParam int offset, @RequestParam int limit,
-            @RequestParam String query) {
-        return new ResponseEntity<>(postMapper.convertToDto(offset, limit,
-                postService.getQueriedPosts(query)), HttpStatus.OK);
+            @RequestParam int offset, @RequestParam int limit, @RequestParam String query) {
+        return ResponseEntity.ok(postMapper.convertToDto(offset, limit,
+                postService.getQueriedPosts(query)));
     }
 
     @GetMapping(value = "/byTag")
     public ResponseEntity<PostsListResponse> postsByTag(
-            @RequestParam int offset, @RequestParam int limit,
-            @RequestParam String tag) {
-        return new ResponseEntity<>(postMapper.convertToDto(offset, limit,
-                postService.getPostsByTag(tag)), HttpStatus.OK);
+            @RequestParam int offset, @RequestParam int limit, @RequestParam String tag) {
+        return ResponseEntity.ok(postMapper.convertToDto(offset, limit,
+                postService.getPostsByTag(tag)));
     }
 
     @GetMapping(value = "/byDate")
     public ResponseEntity<PostsListResponse> postsByDate(
-            @RequestParam int offset, @RequestParam int limit,
-            @RequestParam String date) {
-        return new ResponseEntity<>(postMapper.convertToDto(offset, limit,
-                postService.getPostsByDate(date)), HttpStatus.OK);
+            @RequestParam int offset, @RequestParam int limit, @RequestParam String date) {
+        return ResponseEntity.ok(postMapper.convertToDto(offset, limit,
+                postService.getPostsByDate(date)));
     }
 
     @GetMapping(value = "/my")
-    public ResponseEntity<PostsListResponse> myPosts(
-            @RequestParam int offset, @RequestParam int limit,
-            @RequestParam String status, HttpSession session) {
-        return new ResponseEntity<>(postMapper.convertToDto(offset, limit,
-                postService.getMyPosts(session, status)), HttpStatus.OK);
+    public ResponseEntity<PostsListResponse> myPosts(@RequestParam int offset, @RequestParam int limit,
+                                                     @RequestParam String status, Principal principal) {
+        return ResponseEntity.ok(postMapper.convertToDto(offset, limit,
+                postService.getMyPosts(principal, status)));
     }
 
     @GetMapping(value = "/moderation")
     public ResponseEntity<PostsListResponse> postsForModeration(
             @RequestParam int offset, @RequestParam int limit,
-            @RequestParam String status, HttpSession session) {
-        return new ResponseEntity<>(postMapper.convertToDto(offset, limit,
-                postService.getPostsForModeration(session, status)), HttpStatus.OK);
+            @RequestParam String status, Principal principal) {
+        return ResponseEntity.ok(postMapper.convertToDto(offset, limit,
+                postService.getPostsForModeration(principal.getName(), status)));
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<PostByIdResponse> postById(
-            @PathVariable long id, HttpSession session) {
-        return new ResponseEntity<>(postMapper.convertToDto(postService.getPostByID(id)
-                        .orElseThrow(() -> new EntNotFoundException("post id: " + id)),
-                tagService.getTagsToPost(id), postCommentService.getTagsToPost(id),
-                session), HttpStatus.OK);
+            @PathVariable long id, Principal principal) {
+        return ResponseEntity.ok(postMapper.convertToDto(postService.getPostByID(id)
+                        .orElseThrow(() -> new EntNotFoundException("id: " + id)),
+                tagService.getTagsToPost(id), postCommentService.getTagsToPost(id), principal));
     }
 
     @PutMapping(value = "/{id}")
     public ResponseEntity<ResultResponse> updatePost(
-            @PathVariable long id, @Valid @RequestBody PostRequest request, HttpSession session) {
-        postService.updatePost(id, request, session);
-        return new ResponseEntity<>(new ResultResponse(true), HttpStatus.OK);
+            @PathVariable long id, @Valid @RequestBody PostRequest request, Principal principal) {
+        postService.updatePost(id, request, principal);
+        return ResponseEntity.ok(new ResultResponse(true));
     }
 
     @PostMapping(value = "")
     public ResponseEntity<ResultResponse> newPost(
-            @Valid @RequestBody PostRequest request, HttpSession session) {
-        postService.savePost(postMapper.convertToEntity(request, session));
-        return new ResponseEntity<>(new ResultResponse(true), HttpStatus.OK);
+            @Valid @RequestBody PostRequest request, Principal principal) {
+        return ResponseEntity.ok(postService.savePost(postMapper.convertToEntity(request, principal)));
     }
 
     @PostMapping("/like")
     public ResponseEntity<ResultResponse> like(
-            @Valid @RequestBody LikeRequest request, HttpSession session) {
-        return new ResponseEntity<>(new ResultResponse(postVoteService
-                .like(postService.getPostByLikeRequest(request), session, true)),
-                HttpStatus.OK);
+            @Valid @RequestBody LikeRequest request, Principal principal) {
+        return ResponseEntity.ok(new ResultResponse(postVoteService
+                .like(postService.getPostByLikeRequest(request), principal, true)));
     }
 
     @PostMapping("/dislike")
     public ResponseEntity<ResultResponse> dislike(
-            @Valid @RequestBody LikeRequest request, HttpSession session) {
-        return new ResponseEntity<>(new ResultResponse(postVoteService
-                .like(postService.getPostByLikeRequest(request), session, false)),
-                HttpStatus.OK);
+            @Valid @RequestBody LikeRequest request, Principal principal) {
+        return ResponseEntity.ok(new ResultResponse(postVoteService.like(
+                postService.getPostByLikeRequest(request), principal, false)));
     }
 }

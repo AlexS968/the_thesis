@@ -2,17 +2,16 @@ package application.service;
 
 import application.exception.BadRequestException;
 import application.exception.EntNotFoundException;
-import application.exception.UserUnauthenticatedException;
 import application.model.GlobalSetting;
 import application.model.User;
-import application.repository.GlobalSettingRepository;
-import application.repository.UserRepository;
+import application.model.repository.GlobalSettingRepository;
+import application.model.repository.UserRepository;
 import application.service.interfaces.GlobalSettingService;
-import application.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpSession;
+import java.security.Principal;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -22,7 +21,7 @@ import java.util.stream.StreamSupport;
 @RequiredArgsConstructor
 public class GlobalSettingServiceImpl implements GlobalSettingService {
     private final GlobalSettingRepository globalSettingRepository;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     @Override
     public Set<GlobalSetting> getGlobalSettings() {
@@ -31,9 +30,9 @@ public class GlobalSettingServiceImpl implements GlobalSettingService {
     }
 
     @Override
-    public void saveGlobalSettings(Set<GlobalSetting> settings, HttpSession session) {
-        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(UserUnauthenticatedException::new);
+    public void saveGlobalSettings(Set<GlobalSetting> settings, Principal principal) {
+        User user = userRepository.findByEmail(principal.getName())
+                .orElseThrow(()->new UsernameNotFoundException(principal.getName()));
         //if user is moderator save settings
         if (user.isModerator()) {
             for (GlobalSetting setting : settings) {

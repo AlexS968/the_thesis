@@ -1,22 +1,22 @@
 package application.service;
 
 import application.api.request.RegisterRequest;
+import application.api.response.ResultResponse;
 import application.exception.ApiValidationException;
-import application.exception.EntNotFoundException;
-import application.exception.UserUnauthenticatedException;
 import application.exception.apierror.ApiValidationError;
 import application.model.User;
-import application.repository.CaptchaCodeRepository;
-import application.repository.UserRepository;
+import application.model.repository.CaptchaCodeRepository;
+import application.model.repository.UserRepository;
 import application.service.interfaces.RegisterService;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpSession;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Map;
@@ -25,14 +25,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class RegisterServiceImpl implements RegisterService {
     private final UserRepository userRepository;
-    private final UserServiceImpl userService;
     private final CaptchaCodeRepository captchaCodeRepository;
 
     @Value("${upload.path}")
     private String uploadPath;
 
     @Override
-    public void createUser(RegisterRequest request) {
+    public ResultResponse createUser(RegisterRequest request) {
         ApiValidationError apiValidationError = new ApiValidationError();
         boolean throwException = false;
         //check email
@@ -62,18 +61,14 @@ public class RegisterServiceImpl implements RegisterService {
         }
         userRepository.save(new User(request.getName(), request.getEmail(), request.getPassword(),
                 LocalDateTime.now(), false));
+        return new ResultResponse(true);
     }
 
     @Override
-    public void changeProfile(MultipartFile file, Integer removePhoto, String password,
-                              String name, String email, HttpSession session) throws Exception {
-        //check authentication
-        if (LoginServiceImpl.getSessionsId().get(session.getId()) == null) {
-            throw new UserUnauthenticatedException();
-        }
-        User user = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(EntNotFoundException::new);
-
+    public ResultResponse changeProfile(MultipartFile file, Integer removePhoto, String password,
+                                        String name, String email, Principal principal) throws Exception {
+        User user = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(principal.getName()));
         ApiValidationError apiValidationError = new ApiValidationError();
         boolean throwException = false;
         //save new email
@@ -117,7 +112,7 @@ public class RegisterServiceImpl implements RegisterService {
                         "cloud_name", "dxywt3ld7",
                         "api_key", "372888264999633",
                         "api_secret", "ZJfDjL0K6wxdvtZr-cz0ua0-VSY",
-                        "folder","skillbox/avatar"
+                        "folder", "skillbox/avatar"
                 );
                 Cloudinary cloudinary = new Cloudinary(params);
                 String base64DataURI = "data:image/png;base64,"
@@ -135,6 +130,7 @@ public class RegisterServiceImpl implements RegisterService {
             throw new ApiValidationException(apiValidationError, "User ID: " + user.getId());
         }
         userRepository.save(user);
+        return new ResultResponse(true);
     }
 
     @Override

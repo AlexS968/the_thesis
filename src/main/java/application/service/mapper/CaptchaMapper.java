@@ -1,4 +1,4 @@
-package application.mapper;
+package application.service.mapper;
 
 import application.api.response.CaptchaResponse;
 import application.model.CaptchaCode;
