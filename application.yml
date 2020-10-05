@@ -15,7 +15,7 @@ spring:
       max-request-size: 6MB
       enabled: true
   sendgrid:
-    api-key:
+    api-key: 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
 
 upload:
   path: http://res.cloudinary.com/dxywt3ld7/image/upload
@@ -24,7 +24,7 @@ server:
   port: ${PORT:8080}
 
 appEmail:
-  email: 
+  email: javaentwickler20@gmail.com
 
 captchaExpirationTime: 1
 
