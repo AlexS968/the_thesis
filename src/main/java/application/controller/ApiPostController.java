@@ -5,7 +5,6 @@ import application.api.request.PostRequest;
 import application.api.response.PostByIdResponse;
 import application.api.response.PostsListResponse;
 import application.api.response.ResultResponse;
-import application.exception.EntNotFoundException;
 import application.service.PostCommentServiceImpl;
 import application.service.PostServiceImpl;
 import application.service.PostVoteServiceImpl;
@@ -13,6 +12,7 @@ import application.service.TagServiceImpl;
 import application.service.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -58,13 +58,16 @@ public class ApiPostController {
     }
 
     @GetMapping(value = "/my")
-    public ResponseEntity<PostsListResponse> myPosts(@RequestParam int offset, @RequestParam int limit,
-                                                     @RequestParam String status, Principal principal) {
+    @PreAuthorize("hasAuthority('user:write')")
+    public ResponseEntity<PostsListResponse> myPosts(
+            @RequestParam int offset, @RequestParam int limit,
+            @RequestParam String status, Principal principal) {
         return ResponseEntity.ok(postMapper.convertToDto(offset, limit,
                 postService.getMyPosts(principal, status)));
     }
 
     @GetMapping(value = "/moderation")
+    @PreAuthorize("hasAuthority('user:moderate')")
     public ResponseEntity<PostsListResponse> postsForModeration(
             @RequestParam int offset, @RequestParam int limit,
             @RequestParam String status, Principal principal) {
@@ -75,25 +78,27 @@ public class ApiPostController {
     @GetMapping(value = "/{id}")
     public ResponseEntity<PostByIdResponse> postById(
             @PathVariable long id, Principal principal) {
-        return ResponseEntity.ok(postMapper.convertToDto(postService.getPostByID(id)
-                        .orElseThrow(() -> new EntNotFoundException("id: " + id)),
-                tagService.getTagsToPost(id), postCommentService.getTagsToPost(id), principal));
+        postService.increaseViewCounter(id, principal);
+        return ResponseEntity.ok(postMapper.convertToDto(postService.getPostByID(id),
+                tagService.getTagsToPost(id), postCommentService.getTagsToPost(id)));
     }
 
     @PutMapping(value = "/{id}")
+    @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<ResultResponse> updatePost(
             @PathVariable long id, @Valid @RequestBody PostRequest request, Principal principal) {
-        postService.updatePost(id, request, principal);
-        return ResponseEntity.ok(new ResultResponse(true));
+        return ResponseEntity.ok(postService.updatePost(id, request, principal));
     }
 
     @PostMapping(value = "")
+    @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<ResultResponse> newPost(
             @Valid @RequestBody PostRequest request, Principal principal) {
-        return ResponseEntity.ok(postService.savePost(postMapper.convertToEntity(request, principal)));
+        return ResponseEntity.ok(postService.createNewPost(request, principal));
     }
 
     @PostMapping("/like")
+    @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<ResultResponse> like(
             @Valid @RequestBody LikeRequest request, Principal principal) {
         return ResponseEntity.ok(new ResultResponse(postVoteService
@@ -101,6 +106,7 @@ public class ApiPostController {
     }
 
     @PostMapping("/dislike")
+    @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<ResultResponse> dislike(
             @Valid @RequestBody LikeRequest request, Principal principal) {
         return ResponseEntity.ok(new ResultResponse(postVoteService.like(

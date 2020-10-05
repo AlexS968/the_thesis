@@ -13,6 +13,7 @@ import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +27,7 @@ import java.util.Map;
 public class RegisterServiceImpl implements RegisterService {
     private final UserRepository userRepository;
     private final CaptchaCodeRepository captchaCodeRepository;
+    private final PasswordEncoder encoder;
 
     @Value("${upload.path}")
     private String uploadPath;
@@ -59,8 +61,8 @@ public class RegisterServiceImpl implements RegisterService {
         if (throwException) {
             throw new ApiValidationException(apiValidationError, "");
         }
-        userRepository.save(new User(request.getName(), request.getEmail(), request.getPassword(),
-                LocalDateTime.now(), false));
+        userRepository.save(new User(request.getName(), request.getEmail(), encoder
+                .encode(request.getPassword()), LocalDateTime.now(), false));
         return new ResultResponse(true);
     }
 
@@ -92,7 +94,7 @@ public class RegisterServiceImpl implements RegisterService {
         //save new password
         if (password != null) {
             if (password.length() >= 6) {
-                user.setPassword(password);
+                user.setPassword(encoder.encode(password));
             } else {
                 apiValidationError.setPassword("Password is shorter than 6 characters");
                 throwException = true;

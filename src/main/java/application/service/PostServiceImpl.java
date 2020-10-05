@@ -24,7 +24,9 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -32,11 +34,6 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final TagServiceImpl tagService;
     private final UserRepository userRepository;
-
-    @Override
-    public List<Post> getPosts() {
-        return new ArrayList<>(postRepository.findAll());
-    }
 
     @Override
     public List<Post> getSortedPosts(String mode) {
@@ -147,26 +144,6 @@ public class PostServiceImpl implements PostService {
         return result;
     }
 
-/*    @Override
-    public int getModerationCounter(HttpSession session) {
-        User moderator = userService.findUserById(LoginServiceImpl.getSessionsId()
-                .get(session.getId())).orElseThrow(UserUnauthenticatedException::new);
-        int result;
-        if (moderator == null) {
-            result = postRepository.findAllByIsActiveAndModerationStatusNew(true).size();
-        } else {
-            result = postRepository
-                    .findAllByIsActiveAndModerationStatusNew(true).size()
-                    + postRepository
-                    .findAllByIsActiveAndModeratorIdAndModerationStatusAndOrderByTimeDes(
-                            true, moderator.getId(), "DECLINED").size()
-                    + postRepository
-                    .findAllByIsActiveAndModeratorIdAndModerationStatusAndOrderByTimeDes(
-                            true, moderator.getId(), "ACCEPTED").size();
-        }
-        return result;
-    }*/
-
     @Override
     public ResultResponse moderatePost(ModerationRequest request, Principal principal) {
         boolean result = false;
@@ -185,8 +162,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Optional<Post> getPostByID(long id) {
-        return postRepository.findById(id);
+    public Post getPostByID(long id) {
+        return postRepository.findById(id).orElseThrow(
+                () -> new EntNotFoundException("id: " + id));
     }
 
     @Override
@@ -196,13 +174,47 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ResultResponse savePost(Post post) {
+    public ResultResponse createNewPost(PostRequest request, Principal principal) {
+        User user = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(principal.getName()));
+        //check post title and text
+        ApiValidationError apiValidationError = new ApiValidationError();
+        boolean throwException = false;
+        if (request.getTitle().length() < 3) {
+            apiValidationError.setTitle("Title is too short");
+            throwException = true;
+        }
+        if (request.getText().length() < 50) {
+            apiValidationError.setText("Text is too short");
+            throwException = true;
+        }
+        if (throwException) {
+            throw new ApiValidationException(apiValidationError, "");
+        }
+        //if everything is ok, create new post
+        Post post = new Post();
+        post.setActive(true);
+        post.setModerationStatus(ModerationStatus.NEW);
+        post.setTitle(request.getTitle());
+        post.setText(request.getText());
+        post.setUser(user);
+        //checking post time
+        LocalDateTime postTime = LocalDateTime.ofInstant(
+                Instant.ofEpochMilli(request.getTimestamp() * 1000), ZoneId.of("+02:00"));//+02:00
+        postTime = postTime.isBefore(LocalDateTime.now()) ? LocalDateTime.now() : postTime;
+        post.setTime(postTime);
+        //setting tags to post
+        Set<TagToPost> tagToPosts = new HashSet<>();
+        for (String tag : request.getTags()) {
+            tagToPosts.add(tagService.getOrSaveTag(tag, post));
+        }
+        post.setTagToPosts(tagToPosts);
         postRepository.save(post);
         return new ResultResponse(true);
     }
 
     @Override
-    public Post updatePost(long postId, PostRequest request, Principal principal) {
+    public ResultResponse updatePost(long postId, PostRequest request, Principal principal) {
         User user = userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new UsernameNotFoundException(principal.getName()));
         Post post = postRepository.findById(postId).orElseThrow(EntNotFoundException::new);
@@ -239,11 +251,18 @@ public class PostServiceImpl implements PostService {
         LocalDateTime postTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(request.getTimestamp()), ZoneId.systemDefault());
         postTime = postTime.isBefore(LocalDateTime.now()) ? LocalDateTime.now() : postTime;
         post.setTime(postTime);
-        return postRepository.save(post);
+        postRepository.save(post);
+        return new ResultResponse(true);
     }
 
     @Override
-    public void deletePost(long id) {
-        postRepository.deleteById(id);
+    public void increaseViewCounter(long id, Principal principal) {
+        User user = userRepository.findByEmail(principal.getName()).orElse(null);
+        Post post = getPostByID(id);
+        //increase view counter under certain conditions
+        if (user == null || (!user.isModerator() & post.getUser().getId() != user.getId())) {
+            post.setViewCount(post.getViewCount() + 1);
+            postRepository.save(post);
+        }
     }
 }

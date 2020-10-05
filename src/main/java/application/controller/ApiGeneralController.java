@@ -64,6 +64,7 @@ public class ApiGeneralController {
     }
 
     @PutMapping(value = "api/settings")
+    @PreAuthorize("hasAuthority('user:moderate')")
     public void setSettings(@Valid @RequestBody GlobalSettingRequest request, Principal principal) {
         globalSettingService.saveGlobalSettings(settingMapper.convertToEntity(request), principal);
     }
@@ -74,38 +75,40 @@ public class ApiGeneralController {
     }
 
     @GetMapping(value = "api/calendar")
-    @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<CalendarResponse> calendar(@RequestParam(required = false) Integer year) {
         return ResponseEntity.ok(calendarMapper.convertToDto(calendarService
                 .postsByDayPerYear(year), calendarService.timeOfEarliestPost()));
     }
 
     @GetMapping(value = "api/statistics/all")
-    @PreAuthorize("hasAuthority('user:moderate')")
     public ResponseEntity<StatisticsResponse> allStatistics(Principal principal) {
         return ResponseEntity.ok(statisticsMapper.convertToDto(
                 statisticsService.getAllPostsOrderByTimeAsc(principal)));
     }
 
     @GetMapping(value = "api/statistics/my")
+    @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<StatisticsResponse> myStatistics(Principal principal) {
         return ResponseEntity.ok(statisticsMapper.convertToDto(
                 statisticsService.getAllPostsByUserIdOrderByTimeAsc(principal)));
     }
 
     @PostMapping("api/moderation")
+    @PreAuthorize("hasAuthority('user:moderate')")
     public ResponseEntity<ResultResponse> moderation(
             @Valid @RequestBody ModerationRequest request, Principal principal) {
         return ResponseEntity.ok(postService.moderatePost(request, principal));
     }
 
     @PostMapping(value = "api/image", consumes = {"multipart/form-data"})
+    @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<String> image(
             @RequestParam("image") MultipartFile file, Principal principal) throws IOException {
         return ResponseEntity.ok(imageService.uploadImage(file, principal));
     }
 
     @PostMapping(path = "api/profile/my", consumes = {"multipart/form-data"})
+    @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<ResultResponse> profileWithPhoto(
             @RequestParam(name = "photo", required = false) MultipartFile file,
             @RequestParam(required = false) Integer removePhoto,
@@ -118,6 +121,7 @@ public class ApiGeneralController {
     }
 
     @PostMapping(path = "api/profile/my", consumes = {"application/json;charset=UTF-8"})
+    @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<ResultResponse> profileWithoutPhoto(
             @Valid @RequestBody ProfileRequest request, Principal principal) throws Exception {
         return ResponseEntity.ok(registerService.changeProfile(null, request.getRemovePhoto(),
@@ -125,6 +129,7 @@ public class ApiGeneralController {
     }
 
     @PostMapping("api/comment")
+    @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<CommentResponse> comment(
             @Valid @RequestBody PostCommentRequest request, Principal principal) throws ApiValidationException {
         return ResponseEntity.ok(postCommentService.addPostComment(request, principal));

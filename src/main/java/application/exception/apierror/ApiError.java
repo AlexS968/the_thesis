@@ -19,6 +19,10 @@ public class ApiError {
         this.errors = errors;
     }
 
+    public ApiError(boolean result) {
+        this.result = result;
+    }
+
     public ApiError(boolean result, ApiValidationError errors) {
         this.result = result;
         this.errors = errors;

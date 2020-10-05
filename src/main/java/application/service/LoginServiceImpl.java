@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,7 +39,7 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public AuthenticationResponse login(LoginRequest request) {
+    public AuthenticationResponse login(LoginRequest request) throws BadCredentialsException {
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(auth);
@@ -58,7 +59,6 @@ public class LoginServiceImpl implements LoginService {
                 .orElseThrow(() -> new UsernameNotFoundException(email));
         UserAuthCheckResponse userResponse = new UserAuthCheckResponse();
         authModelMapper().map(user, userResponse);
-        userResponse.setModerationCount(2);
         userResponse.setModerationCount(!user.isModerator() ?
                 0 : postService.getPostsForModeration(email, "new").size());
         return new AuthenticationResponse(true, userResponse);

@@ -6,6 +6,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -25,13 +28,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, null, HttpStatus.NOT_FOUND, req);
     }
 
-    @ExceptionHandler(value = {UserUnauthenticatedException.class})
-    protected ResponseEntity<ApiError> handleUserNotAuthorizedException(
-            UserUnauthenticatedException ex, WebRequest req) {
-        logger.error(ex.getClass().getName() + ", " + ex.getMessage());
-        return handleExceptionInternal(ex, null, HttpStatus.UNAUTHORIZED, req);
-    }
-
     @ExceptionHandler(value = {ApiValidationException.class})
     protected ResponseEntity<ApiError> handleApiValidationException(
             ApiValidationException ex, WebRequest req) {
@@ -46,13 +42,33 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, ex.getError(), HttpStatus.BAD_REQUEST, req);
     }
 
-/*    @ExceptionHandler(value = {AccessDeniedException.class})
-    protected ResponseEntity<ApiError> handleAccessDeniedExceptionException(
-            Exception ex, WebRequest req) {
+    @ExceptionHandler(value = {BadCredentialsException.class})
+    protected ResponseEntity<ApiError> handleBadCredentialsException(
+            BadCredentialsException ex, WebRequest req) {
+        logger.error(ex.toString() + ", " + ex.getMessage());
+        return handleExceptionInternal(ex, new ApiError(false), HttpStatus.OK, req);
+    }
+
+    @ExceptionHandler(value = {AccessDeniedException.class})
+    protected ResponseEntity<ApiError> handleAccessDeniedException(
+            AccessDeniedException ex, WebRequest req) {
+        logger.error(ex.toString() + ", " + ex.getMessage());
+        return handleExceptionInternal(ex, new ApiError(false), HttpStatus.OK, req);
+    }
+
+    @ExceptionHandler(value = {AuthenticationCredentialsNotFoundException.class})
+    protected ResponseEntity<ApiError> handleAuthenticationCredentialsNotFoundException(
+            AuthenticationCredentialsNotFoundException ex, WebRequest req) {
         logger.error(ex.getMessage());
-        ex.printStackTrace();
         return handleExceptionInternal(ex, null, HttpStatus.UNAUTHORIZED, req);
-    }*/
+    }
+
+    @ExceptionHandler(value = {UsernameNotFoundException.class})
+    protected ResponseEntity<ApiError> handleUsernameNotFoundException(
+            UsernameNotFoundException ex, WebRequest req) {
+        logger.error(ex.getMessage());
+        return handleExceptionInternal(ex, null, HttpStatus.UNAUTHORIZED, req);
+    }
 
 /*    @ExceptionHandler(value = {Exception.class})
     protected ResponseEntity<ApiError> handleGenericException(

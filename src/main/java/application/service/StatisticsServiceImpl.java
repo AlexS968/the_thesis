@@ -1,6 +1,5 @@
 package application.service;
 
-import application.exception.UserUnauthenticatedException;
 import application.model.Post;
 import application.model.User;
 import application.model.repository.PostRepository;
@@ -22,18 +21,18 @@ public class StatisticsServiceImpl implements StatisticsService {
     private final GlobalSettingServiceImpl globalSettingService;
 
     public List<Post> getAllPostsOrderByTimeAsc(Principal principal) {
-        User user = userRepository.findByEmail(principal.getName()).orElse(null);
-        boolean userAuthenticatedAndModerator = (user != null) && user.isModerator();
+        boolean userAuthenticatedAndModerator = principal != null && userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(principal.getName())).isModerator();
         //if statistics is not public and user is not moderator throw exception
         if (!globalSettingService.statisticsIsPublic() & !userAuthenticatedAndModerator) {
-            throw new UserUnauthenticatedException();
+            throw new UsernameNotFoundException(null);
         }
         return new ArrayList<>(postRepository.findAllOrderByTimeAsc());
     }
 
     public List<Post> getAllPostsByUserIdOrderByTimeAsc(Principal principal) {
         User user = userRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new UsernameNotFoundException("principal.getName()"));
+                .orElseThrow(() -> new UsernameNotFoundException(principal.getName()));
         return new ArrayList<>(postRepository.findAllByUserIdOrderByTimeAsc(user.getId()));
     }
 }

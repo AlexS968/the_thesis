@@ -11,11 +11,14 @@ import application.exception.EntNotFoundException;
 import application.exception.apierror.ApiError;
 import application.exception.apierror.ApiValidationError;
 import application.model.GlobalSetting;
+import application.model.PostComment;
+import application.model.User;
 import application.model.enums.ModerationStatus;
 import application.model.Post;
 import application.model.repository.GlobalSettingRepository;
 import application.model.repository.PostCommentRepository;
 import application.model.repository.PostRepository;
+import application.model.repository.UserRepository;
 import application.service.ImageServiceImpl;
 import application.service.LoginServiceImpl;
 import org.junit.After;
@@ -25,13 +28,16 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.parameters.P;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
@@ -47,14 +53,27 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
     private LoginServiceImpl loginService;
     @Autowired
     private GlobalSettingRepository settingRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    PasswordEncoder encoder;
     @MockBean
     ImageServiceImpl imageService;
+    @MockBean
+    Principal mockPrincipal;
 
-    private MockHttpSession session;
+    private final String EMAIL = "andy@mail.ru";
+    private final String USER_EMAIL_FLYWAY ="ivanov@mail.ru";
+    private final String MODERATOR_EMAIL_FLYWAY ="petrov@mail.ru";
 
     @Before
     public void setUp() {
-        session = new MockHttpSession();
+        //create and save test user
+        String NAME = "Andy";
+        String PASSWORD = "password";
+        boolean IS_MODERATOR = true;
+        User user = new User(NAME, EMAIL, encoder.encode(PASSWORD), LocalDateTime.now(), IS_MODERATOR);
+        userRepository.save(user);
     }
 
     @Test
@@ -69,45 +88,33 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
 
     @Test
     public void shouldGetSettings() throws Exception {
-        //update repository
-        GlobalSetting setting1 = settingRepository.findByCode("MULTIUSER_MODE")
-                .orElseThrow(EntNotFoundException::new);
-        setting1.setValue("Yes");
-        GlobalSetting setting2 = settingRepository.findByCode("POST_PREMODERATION")
-                .orElseThrow(EntNotFoundException::new);
-        setting2.setValue("No");
-        GlobalSetting setting3 = settingRepository.findByCode("STATISTICS_IS_PUBLIC")
-                .orElseThrow(EntNotFoundException::new);
-        setting3.setValue("Yes");
-        settingRepository.save(setting1);
-        settingRepository.save(setting2);
-        settingRepository.save(setting3);
         //create response
-        GlobalSettingResponse response = new GlobalSettingResponse();
-        response.setMultiuserMode(true);
-        response.setPostPremoderation(false);
-        response.setStatisticsIsPublic(true);
+        GlobalSettingResponse response = new GlobalSettingResponse(
+                settingRepository.findByCode("MULTIUSER_MODE").get().getValue().equals("Yes"),
+                settingRepository.findByCode("POST_PREMODERATION").get().getValue().equals("Yes"),
+                settingRepository.findByCode("STATISTICS_IS_PUBLIC").get().getValue().equals("Yes"));
+
         mockMvc.perform(MockMvcRequestBuilders.get("/api/settings"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(
                         mapper.writeValueAsString(response)));
     }
 
-/*    @Test
+    @Test
+    @WithMockUser(username = EMAIL, authorities = { "user:moderate" })
     public void shouldSetSettingsIfUserIsModerator() throws Exception {
-        //authenticate user with userId = 2, user is moderator
-        loginService.addSessionId(session.getId(), 2);
+        //authenticate user by
+        Mockito.when(mockPrincipal.getName()).thenReturn(EMAIL);
         //create request
-        GlobalSettingRequest request = new GlobalSettingRequest();
-        request.setMultiuserMode(true);
-        request.setPostPremoderation(false);
-        request.setStatisticsIsPublic(false);
+        GlobalSettingRequest request = new GlobalSettingRequest(
+                true,true,true);
+
         mockMvc.perform(MockMvcRequestBuilders.put("/api/settings")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
-                .session(session))
+                .principal(mockPrincipal))
                 .andExpect(MockMvcResultMatchers.status().isOk());
-    }*/
+    }
 
     @Test
     public void shouldGetAllTagsWithWeights() throws Exception {
@@ -147,11 +154,10 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
                         mapper.writeValueAsString(response)));
     }
 
-/*
     @Test
     public void shouldShowAllStatistic() throws Exception {
-        //authenticate user with userId = 2, user is moderator
-        loginService.addSessionId(session.getId(), 2);
+        //authenticate user by
+        Mockito.when(mockPrincipal.getName()).thenReturn(EMAIL);
         //create response
         StatisticsResponse response = new StatisticsResponse();
         response.setPostsCount(4);
@@ -162,16 +168,17 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
                 .of(2019, 10, 2, 10, 23, 54);
         response.setFirstPublication(time.toEpochSecond(ZoneOffset.ofHours(1)));
         mockMvc.perform(MockMvcRequestBuilders.get("/api/statistics/all")
-                .session(session))
+                .principal(mockPrincipal))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(
                         mapper.writeValueAsString(response)));
     }
 
     @Test
-    public void shouldNotShowAllStatisticAndSend401IfProhibitedAndUserUnauthenticated() throws Exception {
-        //authenticate user with userId = 1, user is not moderator
-        loginService.addSessionId(session.getId(), 1);
+    @WithMockUser(username = USER_EMAIL_FLYWAY, authorities = { "user:write" })
+    public void shouldNotShowAllStatisticAndSend401IfProhibitedAndUserIsNotModerator() throws Exception {
+        //authenticate user by
+        Mockito.when(mockPrincipal.getName()).thenReturn(USER_EMAIL_FLYWAY);
         //prohibit show statistic
         GlobalSetting setting = settingRepository.findByCode("STATISTICS_IS_PUBLIC")
                 .orElseThrow(EntNotFoundException::new);
@@ -182,9 +189,36 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @WithMockUser(username = MODERATOR_EMAIL_FLYWAY, authorities = { "user:write" })
+    public void shouldShowAllStatisticAndSend200IfProhibitedAndUserNotModerator() throws Exception {
+        //authenticate user by
+        Mockito.when(mockPrincipal.getName()).thenReturn(MODERATOR_EMAIL_FLYWAY);
+        //prohibit show statistic
+        GlobalSetting setting = settingRepository.findByCode("STATISTICS_IS_PUBLIC")
+                .orElseThrow(EntNotFoundException::new);
+        setting.setValue("No");
+        settingRepository.save(setting);
+        //create response
+        StatisticsResponse response = new StatisticsResponse();
+        response.setPostsCount(4);
+        response.setLikeCount(4);
+        response.setDislikeCount(1);
+        response.setViewCount(22);
+        LocalDateTime time = LocalDateTime
+                .of(2019, 10, 2, 10, 23, 54);
+        response.setFirstPublication(time.toEpochSecond(ZoneOffset.ofHours(1)));
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/statistics/all")
+        .principal(mockPrincipal))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string(
+                        mapper.writeValueAsString(response)));
+    }
+
+    @Test
+    @WithMockUser(username = USER_EMAIL_FLYWAY, authorities = { "user:write" })
     public void shouldShowUserStatistic() throws Exception {
-        //authenticate user with userId = 1
-        loginService.addSessionId(session.getId(), 1);
+        //authenticate user by
+        Mockito.when(mockPrincipal.getName()).thenReturn(USER_EMAIL_FLYWAY);
         //create response
         StatisticsResponse response = new StatisticsResponse();
         response.setPostsCount(2);
@@ -195,46 +229,49 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
                 .of(2019, 10, 2, 10, 23, 54);
         response.setFirstPublication(time.toEpochSecond(ZoneOffset.ofHours(1)));
         mockMvc.perform(MockMvcRequestBuilders.get("/api/statistics/my")
-                .session(session))
+                .principal(mockPrincipal))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(
                         mapper.writeValueAsString(response)));
     }
 
     @Test
+    @WithMockUser(username = MODERATOR_EMAIL_FLYWAY, authorities = { "user:moderate" })
     public void shouldModerateIfUserIsModerator() throws Exception {
-        //authenticate user with userId = 2, user is moderator
-        loginService.addSessionId(session.getId(), 2);
+        //authenticate user by
+        Mockito.when(mockPrincipal.getName()).thenReturn(MODERATOR_EMAIL_FLYWAY);
         //create request
         ModerationRequest request = new ModerationRequest(3, "declined");
         mockMvc.perform(MockMvcRequestBuilders.post("/api/moderation")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
-                .session(session))
+                .principal(mockPrincipal))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(
                         mapper.writeValueAsString(new ResultResponse(true))));
     }
 
     @Test
+    @WithMockUser(username = USER_EMAIL_FLYWAY, authorities = { "user:write" })
     public void shouldNotModerateIfUserIsNotModeratorAndReturn200AndFalse() throws Exception {
-        //authenticate user with userId = 1, user is not moderator
-        loginService.addSessionId(session.getId(), 1);
+        //authenticate user by
+        Mockito.when(mockPrincipal.getName()).thenReturn(USER_EMAIL_FLYWAY);
         //create request
         ModerationRequest request = new ModerationRequest(3, "declined");
         mockMvc.perform(MockMvcRequestBuilders.post("/api/moderation")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
-                .session(session))
+                .principal(mockPrincipal))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(
                         mapper.writeValueAsString(new ResultResponse(false))));
     }
 
     @Test
+    @WithMockUser(username = USER_EMAIL_FLYWAY, authorities = { "user:write" })
     public void shouldUploadImageAndReturnPath() throws Exception {
-        //authenticate user with userId = 1
-        loginService.addSessionId(session.getId(), 1);
+        //authenticate user by
+        Mockito.when(mockPrincipal.getName()).thenReturn(USER_EMAIL_FLYWAY);
         //mock MultipartFile
         MockMultipartFile file =
                 new MockMultipartFile(
@@ -243,19 +280,20 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
                         String.valueOf(MediaType.MULTIPART_FORM_DATA),
                         "<<jpg data>>".getBytes(StandardCharsets.UTF_8));
         //mock uploadImage() from ImageServiceImpl
-        Mockito.when(imageService.uploadImage(file, session)).thenReturn("path");
+        Mockito.when(imageService.uploadImage(file,mockPrincipal)).thenReturn("path");
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/image")
                 .file(file)
                 .accept(MediaType.APPLICATION_JSON)
-                .session(session))
+                .principal(mockPrincipal))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("path"));
     }
 
     @Test
+    @WithMockUser(username = EMAIL, authorities = { "user:write" })
     public void shouldChangeProfileWithPhoto() throws Exception {
-        //authenticate user with userId = 1
-        loginService.addSessionId(session.getId(), 1);
+        //authenticate user by
+        Mockito.when(mockPrincipal.getName()).thenReturn(EMAIL);
         //mock MultipartFile
         MockMultipartFile file =
                 new MockMultipartFile(
@@ -268,16 +306,17 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .param("name", "Mike")
                 .param("email", "mike@mail.ru")
-                .session(session))
+                .principal(mockPrincipal))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(
                         mapper.writeValueAsString(new ResultResponse(true))));
     }
 
     @Test
+    @WithMockUser(username = EMAIL, authorities = { "user:write" })
     public void shouldChangeProfileWithoutPhoto() throws Exception {
-        //authenticate user with userId = 1
-        loginService.addSessionId(session.getId(), 1);
+        //authenticate user by
+        Mockito.when(mockPrincipal.getName()).thenReturn(EMAIL);
         //create request
         ProfileRequest request = new ProfileRequest();
         //name can not be empty
@@ -285,16 +324,17 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/profile/my")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
-                .session(session))
+                .principal(mockPrincipal))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(
                         mapper.writeValueAsString(new ResultResponse(true))));
     }
 
     @Test
+    @WithMockUser(username = EMAIL, authorities = { "user:write" })
     public void shouldNotChangeProfileIfInfoIsNotCorrectAndReturn200AndFalseAndCause() throws Exception {
-        //authenticate user with userId = 1
-        loginService.addSessionId(session.getId(), 1);
+        //authenticate user by
+        Mockito.when(mockPrincipal.getName()).thenReturn(EMAIL);
         //create request
         ProfileRequest request = new ProfileRequest();
         //name can not be empty
@@ -312,7 +352,7 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/profile/my")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
-                .session(session))
+                .principal(mockPrincipal))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(
                         mapper.writeValueAsString(error)));
@@ -320,9 +360,10 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
 
     @Test
     @Transactional
+    @WithMockUser(username = USER_EMAIL_FLYWAY, authorities = { "user:write" })
     public void shouldPlaceComment() throws Exception {
-        //authenticate user with userId = 1
-        loginService.addSessionId(session.getId(), 1);
+        //authenticate user by
+        Mockito.when(mockPrincipal.getName()).thenReturn(USER_EMAIL_FLYWAY);
         //create request
         PostCommentRequest request = new PostCommentRequest();
         request.setPostId(2);
@@ -333,16 +374,17 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/comment")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
-                .session(session))
+                .principal(mockPrincipal))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(
                         mapper.writeValueAsString(response)));
     }
 
     @Test
+    @WithMockUser(username = USER_EMAIL_FLYWAY, authorities = { "user:write" })
     public void shouldNotPlaceCommentIfTextIsTooShortAndReturn200AndFalseAndCause() throws Exception {
-        //authenticate user with userId = 1
-        loginService.addSessionId(session.getId(), 1);
+        //authenticate user by
+        Mockito.when(mockPrincipal.getName()).thenReturn(USER_EMAIL_FLYWAY);
         //create request with too short comment text
         PostCommentRequest request = new PostCommentRequest();
         request.setPostId(2);
@@ -354,23 +396,20 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/comment")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(request))
-                .session(session))
+                .principal(mockPrincipal))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(
                         mapper.writeValueAsString(error)));
     }
-*/
 
     @After
     public void tearDown() {
+        // clean user repository
+        userRepository.deleteByEmail(EMAIL);
+        userRepository.deleteByEmail("mike@mail.ru");
         //recover PostRepository
         Post post = postRepository.findById(3L).get();
         post.setModerationStatus(ModerationStatus.ACCEPTED);
         postRepository.save(post);
-        //recover GlobalSettingRepository
-        GlobalSetting setting = settingRepository.findByCode("STATISTICS_IS_PUBLIC")
-                .orElseThrow(EntNotFoundException::new);
-        setting.setValue("Yes");
-        settingRepository.save(setting);
     }
 }

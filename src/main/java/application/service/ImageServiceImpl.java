@@ -61,7 +61,7 @@ public class ImageServiceImpl implements ImageService {
             String base64DataURI = "data:image/png;base64,"
                     .concat(Base64.getEncoder().encodeToString(file.getBytes()));
             Map result = cloudinary.uploader().upload(base64DataURI, params);
-            return "/upload/".concat(result.get("url").toString().split("upload")[1]);
+            return "/upload".concat(result.get("url").toString().split("upload")[1]);
         } else {
             throw new UsernameNotFoundException(principal.getName());
         }

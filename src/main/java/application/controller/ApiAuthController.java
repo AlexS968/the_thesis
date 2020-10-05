@@ -8,12 +8,14 @@ import application.api.response.AuthenticationResponse;
 import application.api.response.CaptchaResponse;
 import application.api.response.ResultResponse;
 import application.model.CaptchaCode;
-import application.model.repository.UserRepository;
-import application.service.*;
+import application.service.CaptchaServiceImpl;
+import application.service.LoginServiceImpl;
+import application.service.PasswordServiceImpl;
+import application.service.RegisterServiceImpl;
 import application.service.mapper.CaptchaMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -64,6 +66,7 @@ public class ApiAuthController {
     }
 
     @GetMapping("/logout")
+    @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<ResultResponse> logout(Principal principal) {
         return ResponseEntity.ok(loginService.logout(principal));
     }

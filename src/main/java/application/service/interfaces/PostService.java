@@ -8,11 +8,8 @@ import application.model.Post;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 
 public interface PostService {
-
-    List<Post> getPosts();
 
     List<Post> getSortedPosts(String mode);
 
@@ -28,13 +25,13 @@ public interface PostService {
 
     List<Post> getPostsForModeration(String email, String status);
 
-    Optional<Post> getPostByID(long id);
+    Post getPostByID(long id);
 
     Post getPostByLikeRequest(LikeRequest request);
 
-    ResultResponse savePost(Post post);
+    ResultResponse createNewPost(PostRequest request, Principal principal);
 
-    Post updatePost(long postId, PostRequest request, Principal principal);
+    ResultResponse updatePost(long postId, PostRequest request, Principal principal);
 
-    void deletePost(long id);
+    void increaseViewCounter(long id, Principal principal);
 }

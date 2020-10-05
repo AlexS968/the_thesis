@@ -13,6 +13,7 @@ import application.model.repository.PostCommentRepository;
 import application.model.repository.PostRepository;
 import application.model.repository.UserRepository;
 import application.service.interfaces.PostCommentService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
