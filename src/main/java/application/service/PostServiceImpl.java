@@ -96,7 +96,7 @@ public class PostServiceImpl implements PostService {
         switch (status) {
             case "inactive":
                 isActive = false;
-                moderationStatus = "";
+                moderationStatus = "NEW";
                 break;
             case "pending":
                 isActive = true;
