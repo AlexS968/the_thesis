@@ -11,6 +11,7 @@ import application.model.repository.UserRepository;
 import application.service.interfaces.PasswordService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,6 +20,7 @@ public class PasswordServiceImpl implements PasswordService {
     private final UserRepository userRepository;
     private final CaptchaCodeRepository captchaCodeRepository;
     private final SendGridMailServiceImpl sendGridMailService;
+    private final PasswordEncoder encoder;
 
     @Override
     public ResultResponse changePassword(ChangePasswordRequest request) {
@@ -46,7 +48,7 @@ public class PasswordServiceImpl implements PasswordService {
             throw new ApiValidationException(apiValidationError, "");
         } else {
             User user = userRepository.findByCode(request.getCode()).get();
-            user.setPassword(request.getPassword());
+            user.setPassword(encoder.encode(request.getPassword()));
             userRepository.save(user);
         }
         return new ResultResponse(true);
