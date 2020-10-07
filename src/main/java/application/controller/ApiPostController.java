@@ -5,10 +5,10 @@ import application.api.request.PostRequest;
 import application.api.response.PostByIdResponse;
 import application.api.response.PostsListResponse;
 import application.api.response.ResultResponse;
-import application.service.PostCommentServiceImpl;
-import application.service.PostServiceImpl;
-import application.service.PostVoteServiceImpl;
-import application.service.TagServiceImpl;
+import application.service.interfaces.PostCommentService;
+import application.service.interfaces.PostService;
+import application.service.interfaces.PostVoteService;
+import application.service.interfaces.TagService;
 import application.service.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,12 +22,11 @@ import java.security.Principal;
 @RequestMapping(value = "/api/post")
 @RequiredArgsConstructor
 public class ApiPostController {
-
-    private final PostServiceImpl postService;
+    private final PostCommentService postCommentService;
+    private final PostService postService;
+    private final PostVoteService postVoteService;
+    private final TagService tagService;
     private final PostMapper postMapper;
-    private final TagServiceImpl tagService;
-    private final PostCommentServiceImpl postCommentService;
-    private final PostVoteServiceImpl postVoteService;
 
     @GetMapping(value = "")
     public ResponseEntity<PostsListResponse> allPosts(

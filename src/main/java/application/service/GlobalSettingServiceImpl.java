@@ -32,7 +32,7 @@ public class GlobalSettingServiceImpl implements GlobalSettingService {
     @Override
     public void saveGlobalSettings(Set<GlobalSetting> settings, Principal principal) {
         User user = userRepository.findByEmail(principal.getName())
-                .orElseThrow(()->new UsernameNotFoundException(principal.getName()));
+                .orElseThrow(() -> new UsernameNotFoundException(principal.getName()));
         //if user is moderator save settings
         if (user.isModerator()) {
             for (GlobalSetting setting : settings) {
@@ -56,6 +56,20 @@ public class GlobalSettingServiceImpl implements GlobalSettingService {
     public boolean statisticsIsPublic() {
         return Objects.requireNonNull(StreamSupport.stream(globalSettingRepository.findAll().spliterator(), false)
                 .filter(globalSetting -> globalSetting.getCode().equals("STATISTICS_IS_PUBLIC"))
+                .findFirst().orElse(null)).getValue().equals("Yes");
+    }
+
+    @Override
+    public boolean postPreModerationEnabled() {
+        return Objects.requireNonNull(StreamSupport.stream(globalSettingRepository.findAll().spliterator(), false)
+                .filter(globalSetting -> globalSetting.getCode().equals("POST_PREMODERATION"))
+                .findFirst().orElse(null)).getValue().equals("Yes");
+    }
+
+    @Override
+    public boolean multiUserModeEnabled() {
+        return Objects.requireNonNull(StreamSupport.stream(globalSettingRepository.findAll().spliterator(), false)
+                .filter(globalSetting -> globalSetting.getCode().equals("MULTIUSER_MODE"))
                 .findFirst().orElse(null)).getValue().equals("Yes");
     }
 }

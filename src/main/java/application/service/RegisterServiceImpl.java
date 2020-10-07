@@ -3,10 +3,12 @@ package application.service;
 import application.api.request.RegisterRequest;
 import application.api.response.ResultResponse;
 import application.exception.ApiValidationException;
+import application.exception.EntNotFoundException;
 import application.exception.apierror.ApiValidationError;
 import application.model.User;
 import application.model.repository.CaptchaCodeRepository;
 import application.model.repository.UserRepository;
+import application.service.interfaces.GlobalSettingService;
 import application.service.interfaces.RegisterService;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
@@ -27,6 +29,7 @@ import java.util.Map;
 public class RegisterServiceImpl implements RegisterService {
     private final UserRepository userRepository;
     private final CaptchaCodeRepository captchaCodeRepository;
+    private final GlobalSettingService globalSettingService;
     private final PasswordEncoder encoder;
 
     @Value("${upload.path}")
@@ -34,6 +37,9 @@ public class RegisterServiceImpl implements RegisterService {
 
     @Override
     public ResultResponse createUser(RegisterRequest request) {
+        if (!globalSettingService.multiUserModeEnabled()){
+            throw new EntNotFoundException();
+        }
         ApiValidationError apiValidationError = new ApiValidationError();
         boolean throwException = false;
         //check email

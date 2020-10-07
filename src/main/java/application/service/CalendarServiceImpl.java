@@ -22,7 +22,7 @@ public class CalendarServiceImpl implements CalendarService {
         LocalDateTime from, to;
         if (givenYear == null || givenYear == LocalDateTime.now().getYear()) {
             from = LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0);
-            to = LocalDateTime.now();
+            to = LocalDateTime.now().plusHours(2);
         } else {
             from = LocalDateTime.of(givenYear, 1, 1, 0, 0);
             to = LocalDateTime.of(givenYear + 1, 1, 1, 0, 0);

@@ -14,7 +14,9 @@ import application.model.User;
 import application.model.enums.ModerationStatus;
 import application.model.repository.PostRepository;
 import application.model.repository.UserRepository;
+import application.service.interfaces.GlobalSettingService;
 import application.service.interfaces.PostService;
+import application.service.interfaces.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -32,8 +34,9 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
-    private final TagServiceImpl tagService;
+    private final TagService tagService;
     private final UserRepository userRepository;
+    private final GlobalSettingService globalSettingService;
 
     @Override
     public List<Post> getSortedPosts(String mode) {
@@ -194,7 +197,9 @@ public class PostServiceImpl implements PostService {
         //if everything is ok, create new post
         Post post = new Post();
         post.setActive(true);
-        post.setModerationStatus(ModerationStatus.NEW);
+        //if post premoderation is disabled publish the posts immediately
+        post.setModerationStatus(globalSettingService.postPreModerationEnabled() ?
+                ModerationStatus.NEW : ModerationStatus.ACCEPTED);
         post.setTitle(request.getTitle());
         post.setText(request.getText());
         post.setUser(user);

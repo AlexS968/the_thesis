@@ -6,6 +6,7 @@ import application.api.response.ResultResponse;
 import application.api.response.type.UserAuthCheckResponse;
 import application.model.repository.UserRepository;
 import application.service.interfaces.LoginService;
+import application.service.interfaces.PostService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +24,7 @@ import java.security.Principal;
 @RequiredArgsConstructor
 public class LoginServiceImpl implements LoginService {
     private final UserRepository userRepository;
-    private final PostServiceImpl postService;
+    private final PostService postService;
     private final AuthenticationManager authenticationManager;
 
     @Bean

@@ -6,7 +6,7 @@ import application.api.request.PostCommentRequest;
 import application.api.request.ProfileRequest;
 import application.api.response.*;
 import application.exception.ApiValidationException;
-import application.service.*;
+import application.service.interfaces.*;
 import application.service.mapper.CalendarMapper;
 import application.service.mapper.GlobalSettingMapper;
 import application.service.mapper.StatisticsMapper;
@@ -26,18 +26,18 @@ import java.security.Principal;
 @RequestMapping(value = "/")
 @RequiredArgsConstructor
 public class ApiGeneralController {
-    private final GlobalSettingServiceImpl globalSettingService;
-    private final GlobalSettingMapper settingMapper;
-    private final TagServiceImpl tagService;
-    private final TagMapper tagMapper;
-    private final CalendarServiceImpl calendarService;
+    private final CalendarService calendarService;
+    private final GlobalSettingService globalSettingService;
+    private final ImageService imageService;
+    private final PostService postService;
+    private final PostCommentService postCommentService;
+    private final RegisterService registerService;
+    private final StatisticsService statisticsService;
+    private final TagService tagService;
     private final CalendarMapper calendarMapper;
-    private final StatisticsServiceImpl statisticsService;
+    private final GlobalSettingMapper settingMapper;
     private final StatisticsMapper statisticsMapper;
-    private final PostServiceImpl postService;
-    private final PostCommentServiceImpl postCommentService;
-    private final RegisterServiceImpl registerService;
-    private final ImageServiceImpl imageService;
+    private final TagMapper tagMapper;
 
     @Value("${blogInfo.title}")
     String title;

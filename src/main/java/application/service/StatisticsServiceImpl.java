@@ -4,6 +4,7 @@ import application.model.Post;
 import application.model.User;
 import application.model.repository.PostRepository;
 import application.model.repository.UserRepository;
+import application.service.interfaces.GlobalSettingService;
 import application.service.interfaces.StatisticsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,7 +19,7 @@ import java.util.List;
 public class StatisticsServiceImpl implements StatisticsService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final GlobalSettingServiceImpl globalSettingService;
+    private final GlobalSettingService globalSettingService;
 
     public List<Post> getAllPostsOrderByTimeAsc(Principal principal) {
         boolean userAuthenticatedAndModerator = principal != null && userRepository.findByEmail(principal.getName())

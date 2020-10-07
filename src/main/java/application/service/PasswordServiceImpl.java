@@ -9,6 +9,7 @@ import application.model.User;
 import application.model.repository.CaptchaCodeRepository;
 import application.model.repository.UserRepository;
 import application.service.interfaces.PasswordService;
+import application.service.interfaces.SendGridMailService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Service;
 public class PasswordServiceImpl implements PasswordService {
     private final UserRepository userRepository;
     private final CaptchaCodeRepository captchaCodeRepository;
-    private final SendGridMailServiceImpl sendGridMailService;
+    private final SendGridMailService sendGridMailService;
     private final PasswordEncoder encoder;
 
     @Override
