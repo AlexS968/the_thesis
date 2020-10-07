@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +23,8 @@ public class CalendarServiceImpl implements CalendarService {
         LocalDateTime from, to;
         if (givenYear == null || givenYear == LocalDateTime.now().getYear()) {
             from = LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0);
-            to = LocalDateTime.now().plusHours(2);
+            to = LocalDateTime.now();
+            System.out.println("TimeZone.getDefault в CalenderService "+TimeZone.getDefault());
         } else {
             from = LocalDateTime.of(givenYear, 1, 1, 0, 0);
             to = LocalDateTime.of(givenYear + 1, 1, 1, 0, 0);

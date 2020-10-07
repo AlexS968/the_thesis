@@ -29,6 +29,7 @@ import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 @Service
 @RequiredArgsConstructor
@@ -69,6 +70,8 @@ public class PostServiceImpl implements PostService {
             default:
                 posts = null;
         }
+        System.out.println("TimeZone.getDefault in PostService "+TimeZone.getDefault());
+        System.out.println("Timestamp.valueOf(LocalDateTime.now()) in PostService "+Timestamp.valueOf(LocalDateTime.now()));
         return posts;
     }
 
@@ -205,7 +208,7 @@ public class PostServiceImpl implements PostService {
         post.setUser(user);
         //checking post time
         LocalDateTime postTime = LocalDateTime.ofInstant(
-                Instant.ofEpochMilli(request.getTimestamp() * 1000), ZoneId.of("+02:00"));//+02:00
+                Instant.ofEpochMilli(request.getTimestamp() * 1000), ZoneId.systemDefault());
         postTime = postTime.isBefore(LocalDateTime.now()) ? LocalDateTime.now() : postTime;
         post.setTime(postTime);
         //setting tags to post
