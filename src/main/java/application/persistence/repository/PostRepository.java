@@ -79,8 +79,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query(value = "SELECT t.name AS name, COUNT(p.*) AS total " +
             "FROM posts As p, tag2post AS t2p, tags As t " +
-            "WHERE p.id = t2p.post_id AND t.id = t2p.tag_id GROUP BY name", nativeQuery = true)
-    List<IPostCount> countPostsByTag();
+            "WHERE p.id = t2p.post_id AND t.id = t2p.tag_id AND p.is_active = ?1 AND " +
+            "p.moderation_status = ?2 AND p.time <= ?3 " +
+            "GROUP BY name", nativeQuery = true)
+    List<IPostCount> countPostsByTag(boolean isActive, String moderationStatus, Timestamp time);
 
     @Query(value = "SELECT to_char(time, 'YYYY-MM-DD') AS name, COUNT(*)  AS total " +
             "FROM posts " +

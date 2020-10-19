@@ -286,7 +286,8 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<IPostCount> countPostsByTag() {
-        return postRepository.countPostsByTag();
+        return postRepository.countPostsByTag(true, "ACCEPTED",
+                Timestamp.valueOf(LocalDateTime.now()));
     }
 
     @Override
