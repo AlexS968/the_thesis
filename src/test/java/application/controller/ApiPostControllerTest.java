@@ -1,35 +1,21 @@
 package application.controller;
 
 import application.AbstractIntegrationTest;
-import application.api.request.LikeRequest;
-import application.api.request.PostRequest;
 import application.api.response.PostResponse;
 import application.api.response.PostsListResponse;
-import application.api.response.ResultResponse;
-import application.exception.EntNotFoundException;
-import application.exception.apierror.ApiError;
-import application.exception.apierror.ApiValidationError;
 import application.service.mapper.PostMapper;
-import application.model.Post;
-import application.model.PostComment;
-import application.model.repository.PostRepository;
-import application.model.repository.PostVoteRepository;
-import application.model.repository.TagRepository;
-import application.service.LoginServiceImpl;
-import application.service.PostServiceImpl;
-import org.junit.After;
+import application.persistence.repository.PostRepository;
+import application.persistence.repository.PostVoteRepository;
+import application.persistence.repository.TagRepository;
+import application.service.impl.LoginServiceImpl;
+import application.service.impl.PostServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class ApiPostControllerTest extends AbstractIntegrationTest {
 

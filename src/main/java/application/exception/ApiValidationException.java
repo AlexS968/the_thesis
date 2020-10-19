@@ -6,12 +6,8 @@ public class ApiValidationException extends RuntimeException {
 
     private ApiValidationError errors;
 
-    public ApiValidationException(String message) {
-        super(message);
-    }
-
-    public ApiValidationException(ApiValidationError errors, String message) {
-        super(message);
+    public ApiValidationException(ApiValidationError errors) {
+        super("");
         this.errors = errors;
     }
 

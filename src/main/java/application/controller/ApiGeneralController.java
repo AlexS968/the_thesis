@@ -5,8 +5,7 @@ import application.api.request.ModerationRequest;
 import application.api.request.PostCommentRequest;
 import application.api.request.ProfileRequest;
 import application.api.response.*;
-import application.exception.ApiValidationException;
-import application.service.interfaces.*;
+import application.service.*;
 import application.service.mapper.CalendarMapper;
 import application.service.mapper.GlobalSettingMapper;
 import application.service.mapper.StatisticsMapper;
@@ -71,7 +70,7 @@ public class ApiGeneralController {
 
     @GetMapping(value = "api/tag")
     public ResponseEntity<TagsResponse> tags(@RequestParam(required = false) String query) {
-        return ResponseEntity.ok(tagMapper.convertToDto(tagService.getTags(query), tagService.getWeights()));
+        return ResponseEntity.ok(tagMapper.convertToDto(tagService.getTags(query), postService.countPostsByTag()));
     }
 
     @GetMapping(value = "api/calendar")
@@ -131,7 +130,7 @@ public class ApiGeneralController {
     @PostMapping("api/comment")
     @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<CommentResponse> comment(
-            @Valid @RequestBody PostCommentRequest request, Principal principal) throws ApiValidationException {
+            @Valid @RequestBody PostCommentRequest request, Principal principal) {
         return ResponseEntity.ok(postCommentService.addPostComment(request, principal));
     }
 }

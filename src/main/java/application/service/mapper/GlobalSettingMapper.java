@@ -2,7 +2,7 @@ package application.service.mapper;
 
 import application.api.request.GlobalSettingRequest;
 import application.api.response.GlobalSettingResponse;
-import application.model.GlobalSetting;
+import application.persistence.model.GlobalSetting;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;

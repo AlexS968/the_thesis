@@ -1,7 +1,7 @@
 package application.service.mapper;
 
 import application.api.response.StatisticsResponse;
-import application.model.Post;
+import application.persistence.model.Post;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneOffset;

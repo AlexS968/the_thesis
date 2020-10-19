@@ -9,9 +9,12 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class ApiError {
+
     private boolean result;
+
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String message;
+
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private ApiValidationError errors;
 

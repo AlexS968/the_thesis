@@ -7,11 +7,11 @@ import application.api.request.RegisterRequest;
 import application.api.response.AuthenticationResponse;
 import application.api.response.CaptchaResponse;
 import application.api.response.ResultResponse;
-import application.model.CaptchaCode;
-import application.service.interfaces.CaptchaService;
-import application.service.interfaces.LoginService;
-import application.service.interfaces.PasswordService;
-import application.service.interfaces.RegisterService;
+import application.persistence.model.CaptchaCode;
+import application.service.CaptchaCodeService;
+import application.service.LoginService;
+import application.service.PasswordService;
+import application.service.RegisterService;
 import application.service.mapper.CaptchaMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +25,7 @@ import java.security.Principal;
 @RequestMapping(value = "/api/auth")
 @RequiredArgsConstructor
 public class ApiAuthController {
-    private final CaptchaService captchaService;
+    private final CaptchaCodeService captchaCodeService;
     private final LoginService loginService;
     private final PasswordService passwordService;
     private final RegisterService registerService;
@@ -38,9 +38,9 @@ public class ApiAuthController {
 
     @GetMapping(value = "/captcha")
     public ResponseEntity<CaptchaResponse> captcha() throws Exception {
-        CaptchaCode captchaCode = captchaService.captchaGenerator();
+        CaptchaCode captchaCode = captchaCodeService.captchaGenerator();
         return ResponseEntity.ok(captchaMapper.convertToDto(
-                captchaCode, captchaService.conversionToBase64(captchaCode)));
+                captchaCode, captchaCodeService.conversionToBase64(captchaCode)));
     }
 
     @PostMapping("/restore")

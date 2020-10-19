@@ -1,8 +1,9 @@
 package application.service;
 
-import application.model.Post;
-import application.model.repository.IPostCount;
-import application.model.repository.PostRepository;
+import application.persistence.model.Post;
+import application.persistence.repository.IPostCount;
+import application.persistence.repository.PostRepository;
+import application.service.impl.CalendarServiceImpl;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +20,7 @@ import java.util.*;
 public class CalendarServiceTest {
 
     @Mock
-    private PostRepository postRepository;
+    private PostService postService;
     @InjectMocks
     private CalendarServiceImpl calendarService;
 
@@ -28,7 +29,7 @@ public class CalendarServiceTest {
         LocalDateTime postTime = LocalDateTime.now().minusYears(100);
         Post post = new Post();
         post.setTime(postTime);
-        Mockito.when(postRepository.findEarliestPost()).thenReturn(Optional.of(post));
+        Mockito.when(postService.findEarliestPost()).thenReturn(Optional.of(post));
         Assert.assertEquals(postTime, calendarService.timeOfEarliestPost());
     }
 
@@ -49,7 +50,7 @@ public class CalendarServiceTest {
 
         LocalDateTime from = LocalDateTime.of(2019, 1, 1, 0, 0);
         LocalDateTime to = LocalDateTime.of(2020, 1, 1, 0, 0);
-        Mockito.when(postRepository.countPostsByDay(Timestamp.valueOf(from), Timestamp.valueOf(to)))
+        Mockito.when(postService.countPostsByDay(Timestamp.valueOf(from), Timestamp.valueOf(to)))
                 .thenReturn(iPostCountList);
 
         Map<String, Integer> postsByDayPerYear = new HashMap<>();

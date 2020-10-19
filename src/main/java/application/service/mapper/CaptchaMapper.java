@@ -1,7 +1,7 @@
 package application.service.mapper;
 
 import application.api.response.CaptchaResponse;
-import application.model.CaptchaCode;
+import application.persistence.model.CaptchaCode;
 import org.springframework.stereotype.Service;
 
 @Service

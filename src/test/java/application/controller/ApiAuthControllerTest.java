@@ -9,15 +9,15 @@ import application.api.response.AuthenticationResponse;
 import application.api.response.CaptchaResponse;
 import application.api.response.ResultResponse;
 import application.api.response.type.UserAuthCheckResponse;
+import application.exception.BadRequestException;
 import application.exception.apierror.ApiError;
 import application.exception.apierror.ApiValidationError;
-import application.model.CaptchaCode;
-import application.model.User;
-import application.model.repository.CaptchaCodeRepository;
-import application.model.repository.PostCommentRepository;
-import application.model.repository.UserRepository;
-import application.service.CaptchaServiceImpl;
-import application.service.LoginServiceImpl;
+import application.persistence.model.CaptchaCode;
+import application.persistence.model.User;
+import application.persistence.repository.CaptchaCodeRepository;
+import application.persistence.repository.UserRepository;
+import application.service.impl.CaptchaCodeServiceImpl;
+import application.service.impl.LoginServiceImpl;
 import application.service.mapper.CaptchaMapper;
 import org.junit.After;
 import org.junit.Before;
@@ -34,6 +34,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.security.Principal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public class ApiAuthControllerTest extends AbstractIntegrationTest {
 
@@ -42,13 +43,11 @@ public class ApiAuthControllerTest extends AbstractIntegrationTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private CaptchaCodeRepository captchaCodeRepository;
-    @Autowired
     private CaptchaMapper captchaMapper;
     @Autowired
     PasswordEncoder encoder;
     @MockBean
-    private CaptchaServiceImpl captchaService;
+    private CaptchaCodeServiceImpl captchaService;
     @MockBean
     Principal mockPrincipal;
 
@@ -69,11 +68,8 @@ public class ApiAuthControllerTest extends AbstractIntegrationTest {
         user = new User(NAME, EMAIL, encoder.encode(PASSWORD), LocalDateTime.now(), IS_MODERATOR);
         user.setCode(HASH);
         userRepository.save(user);
-        //clean captcha repository
-        captchaCodeRepository.deleteAllOld(Timestamp.valueOf(LocalDateTime.now()));
         //set captcha
         captchaCode = new CaptchaCode(LocalDateTime.now(), CODE, SECRET_CODE);
-        captchaCodeRepository.save(captchaCode);
     }
 
     @Test
@@ -133,23 +129,12 @@ public class ApiAuthControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void shouldReturn200AndFalse_IfEmailIsInvalid() throws Exception {
-        //create request with incorrect email
-        PasswordRestoreRequest request = new PasswordRestoreRequest("vittel@mail.ru");
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/restore")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string(mapper
-                        .writeValueAsString(new ResultResponse(false))));
-    }
-
-    @Test
     public void shouldChangePasswordAndReturn200AndTrue_IfRequestIsCorrect() throws Exception {
         //create request with correct data
         ChangePasswordRequest request = new ChangePasswordRequest(HASH,
                 "password", CODE, SECRET_CODE);
+        //mock methods from CaptchaService
+        Mockito.when(captchaService.captchaIsValid(CODE,SECRET_CODE)).thenReturn(true);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/password")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -182,6 +167,8 @@ public class ApiAuthControllerTest extends AbstractIntegrationTest {
         //create request with correct data
         RegisterRequest request = new RegisterRequest(NEW_EMAIL, "newPassword",
                 NAME, CODE, SECRET_CODE);
+        //mock methods from CaptchaService
+        Mockito.when(captchaService.captchaIsValid(CODE,SECRET_CODE)).thenReturn(true);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)

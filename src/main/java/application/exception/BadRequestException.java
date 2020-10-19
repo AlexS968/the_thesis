@@ -5,26 +5,22 @@ import application.exception.apierror.ApiValidationError;
 
 public class BadRequestException extends RuntimeException {
 
-    private ApiError error;
-
-    public BadRequestException() {
-        super();
-    }
+    private ApiError errors;
 
     public BadRequestException(String message) {
         super(message);
     }
 
-    public BadRequestException(ApiError error, String message) {
-        super(message);
-        this.error = error;
+    public BadRequestException(ApiValidationError error) {
+        super("");
+        this.errors = new ApiError(error);
     }
 
-    public ApiError getError() {
-        return error;
+    public ApiError getErrors() {
+        return errors;
     }
 
-    public void setError(ApiError error) {
-        this.error = error;
+    public void setErrors(ApiError errors) {
+        this.errors = errors;
     }
 }

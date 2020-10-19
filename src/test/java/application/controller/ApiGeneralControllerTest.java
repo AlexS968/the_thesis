@@ -7,20 +7,18 @@ import application.api.request.PostCommentRequest;
 import application.api.request.ProfileRequest;
 import application.api.response.*;
 import application.api.response.type.TagResponse;
-import application.exception.EntNotFoundException;
 import application.exception.apierror.ApiError;
 import application.exception.apierror.ApiValidationError;
-import application.model.GlobalSetting;
-import application.model.PostComment;
-import application.model.User;
-import application.model.enums.ModerationStatus;
-import application.model.Post;
-import application.model.repository.GlobalSettingRepository;
-import application.model.repository.PostCommentRepository;
-import application.model.repository.PostRepository;
-import application.model.repository.UserRepository;
-import application.service.ImageServiceImpl;
-import application.service.LoginServiceImpl;
+import application.persistence.enums.ModerationStatus;
+import application.persistence.model.GlobalSetting;
+import application.persistence.model.Post;
+import application.persistence.model.User;
+import application.persistence.repository.GlobalSettingRepository;
+import application.persistence.repository.PostCommentRepository;
+import application.persistence.repository.PostRepository;
+import application.persistence.repository.UserRepository;
+import application.service.impl.ImageServiceImpl;
+import application.service.impl.LoginServiceImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,13 +27,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -63,8 +61,8 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
     Principal mockPrincipal;
 
     private final String EMAIL = "andy@mail.ru";
-    private final String USER_EMAIL_FLYWAY ="ivanov@mail.ru";
-    private final String MODERATOR_EMAIL_FLYWAY ="petrov@mail.ru";
+    private final String USER_EMAIL_FLYWAY = "ivanov@mail.ru";
+    private final String MODERATOR_EMAIL_FLYWAY = "petrov@mail.ru";
 
     @Before
     public void setUp() {
@@ -78,8 +76,8 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
 
     @Test
     public void shouldInitialize() throws Exception {
-        InitResponse response = new InitResponse("DevPub","Program developer stories",
-                "+7 903 666-44-55","mail@mail.ru","Dmitry Sergeev","2005");
+        InitResponse response = new InitResponse("DevPub", "Program developer stories",
+                "+7 903 666-44-55", "mail@mail.ru", "Dmitry Sergeev", "2005");
         mockMvc.perform(MockMvcRequestBuilders.get("/api/init"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(
@@ -101,13 +99,13 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = EMAIL, authorities = { "user:moderate" })
+    @WithMockUser(username = EMAIL, authorities = {"user:moderate"})
     public void shouldSetSettingsIfUserIsModerator() throws Exception {
         //authenticate user by
         Mockito.when(mockPrincipal.getName()).thenReturn(EMAIL);
         //create request
         GlobalSettingRequest request = new GlobalSettingRequest(
-                true,true,true);
+                true, true, true);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/settings")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -175,13 +173,13 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = USER_EMAIL_FLYWAY, authorities = { "user:write" })
+    @WithMockUser(username = USER_EMAIL_FLYWAY, authorities = {"user:write"})
     public void shouldNotShowAllStatisticAndSend401IfProhibitedAndUserIsNotModerator() throws Exception {
         //authenticate user by
         Mockito.when(mockPrincipal.getName()).thenReturn(USER_EMAIL_FLYWAY);
         //prohibit show statistic
         GlobalSetting setting = settingRepository.findByCode("STATISTICS_IS_PUBLIC")
-                .orElseThrow(EntNotFoundException::new);
+                .orElseThrow(EntityNotFoundException::new);
         setting.setValue("No");
         settingRepository.save(setting);
         mockMvc.perform(MockMvcRequestBuilders.get("/api/statistics/all"))
@@ -189,13 +187,13 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = MODERATOR_EMAIL_FLYWAY, authorities = { "user:write" })
+    @WithMockUser(username = MODERATOR_EMAIL_FLYWAY, authorities = {"user:write"})
     public void shouldShowAllStatisticAndSend200IfProhibitedAndUserNotModerator() throws Exception {
         //authenticate user by
         Mockito.when(mockPrincipal.getName()).thenReturn(MODERATOR_EMAIL_FLYWAY);
         //prohibit show statistic
         GlobalSetting setting = settingRepository.findByCode("STATISTICS_IS_PUBLIC")
-                .orElseThrow(EntNotFoundException::new);
+                .orElseThrow(EntityNotFoundException::new);
         setting.setValue("No");
         settingRepository.save(setting);
         //create response
@@ -208,14 +206,14 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
                 .of(2019, 10, 2, 10, 23, 54);
         response.setFirstPublication(time.toEpochSecond(ZoneOffset.ofHours(1)));
         mockMvc.perform(MockMvcRequestBuilders.get("/api/statistics/all")
-        .principal(mockPrincipal))
+                .principal(mockPrincipal))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(
                         mapper.writeValueAsString(response)));
     }
 
     @Test
-    @WithMockUser(username = USER_EMAIL_FLYWAY, authorities = { "user:write" })
+    @WithMockUser(username = USER_EMAIL_FLYWAY, authorities = {"user:write"})
     public void shouldShowUserStatistic() throws Exception {
         //authenticate user by
         Mockito.when(mockPrincipal.getName()).thenReturn(USER_EMAIL_FLYWAY);
@@ -236,7 +234,7 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = MODERATOR_EMAIL_FLYWAY, authorities = { "user:moderate" })
+    @WithMockUser(username = MODERATOR_EMAIL_FLYWAY, authorities = {"user:moderate"})
     public void shouldModerateIfUserIsModerator() throws Exception {
         //authenticate user by
         Mockito.when(mockPrincipal.getName()).thenReturn(MODERATOR_EMAIL_FLYWAY);
@@ -252,7 +250,7 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = USER_EMAIL_FLYWAY, authorities = { "user:write" })
+    @WithMockUser(username = USER_EMAIL_FLYWAY, authorities = {"user:write"})
     public void shouldNotModerateIfUserIsNotModeratorAndReturn200AndFalse() throws Exception {
         //authenticate user by
         Mockito.when(mockPrincipal.getName()).thenReturn(USER_EMAIL_FLYWAY);
@@ -268,7 +266,7 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = USER_EMAIL_FLYWAY, authorities = { "user:write" })
+    @WithMockUser(username = USER_EMAIL_FLYWAY, authorities = {"user:write"})
     public void shouldUploadImageAndReturnPath() throws Exception {
         //authenticate user by
         Mockito.when(mockPrincipal.getName()).thenReturn(USER_EMAIL_FLYWAY);
@@ -280,7 +278,7 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
                         String.valueOf(MediaType.MULTIPART_FORM_DATA),
                         "<<jpg data>>".getBytes(StandardCharsets.UTF_8));
         //mock uploadImage() from ImageServiceImpl
-        Mockito.when(imageService.uploadImage(file,mockPrincipal)).thenReturn("path");
+        Mockito.when(imageService.uploadImage(file, mockPrincipal)).thenReturn("path");
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/image")
                 .file(file)
                 .accept(MediaType.APPLICATION_JSON)
@@ -290,7 +288,7 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = EMAIL, authorities = { "user:write" })
+    @WithMockUser(username = EMAIL, authorities = {"user:write"})
     public void shouldChangeProfileWithPhoto() throws Exception {
         //authenticate user by
         Mockito.when(mockPrincipal.getName()).thenReturn(EMAIL);
@@ -313,7 +311,7 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = EMAIL, authorities = { "user:write" })
+    @WithMockUser(username = EMAIL, authorities = {"user:write"})
     public void shouldChangeProfileWithoutPhoto() throws Exception {
         //authenticate user by
         Mockito.when(mockPrincipal.getName()).thenReturn(EMAIL);
@@ -331,7 +329,7 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = EMAIL, authorities = { "user:write" })
+    @WithMockUser(username = EMAIL, authorities = {"user:write"})
     public void shouldNotChangeProfileIfInfoIsNotCorrectAndReturn200AndFalseAndCause() throws Exception {
         //authenticate user by
         Mockito.when(mockPrincipal.getName()).thenReturn(EMAIL);
@@ -360,7 +358,7 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
 
     @Test
     @Transactional
-    @WithMockUser(username = USER_EMAIL_FLYWAY, authorities = { "user:write" })
+    @WithMockUser(username = USER_EMAIL_FLYWAY, authorities = {"user:write"})
     public void shouldPlaceComment() throws Exception {
         //authenticate user by
         Mockito.when(mockPrincipal.getName()).thenReturn(USER_EMAIL_FLYWAY);
@@ -381,7 +379,7 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = USER_EMAIL_FLYWAY, authorities = { "user:write" })
+    @WithMockUser(username = USER_EMAIL_FLYWAY, authorities = {"user:write"})
     public void shouldNotPlaceCommentIfTextIsTooShortAndReturn200AndFalseAndCause() throws Exception {
         //authenticate user by
         Mockito.when(mockPrincipal.getName()).thenReturn(USER_EMAIL_FLYWAY);
