@@ -299,6 +299,4 @@ public class PostServiceImpl implements PostService {
     public List<Post> findAllByUserIdOrderByTimeAsc(long userId) {
         return postRepository.findAllByUserIdOrderByTimeAsc(userId);
     }
-
-
 }

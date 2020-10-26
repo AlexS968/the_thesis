@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class CountDataResponse extends PostDataResponse{
+public abstract class CountDataResponse extends PostDataResponse {
     private long likeCount;
     private long dislikeCount;
     private int viewCount;

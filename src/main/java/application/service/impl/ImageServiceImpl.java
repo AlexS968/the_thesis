@@ -1,7 +1,6 @@
 package application.service.impl;
 
 import application.exception.BadRequestException;
-import application.exception.apierror.ApiError;
 import application.exception.apierror.ApiValidationError;
 import application.service.ImageService;
 import application.service.UserService;

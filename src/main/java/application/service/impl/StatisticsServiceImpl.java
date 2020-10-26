@@ -22,6 +22,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     private final PostService postService;
     private final UserService userService;
 
+    @Override
     public List<Post> getAllPostsOrderByTimeAsc(Principal principal) {
         boolean userAuthenticatedAndModerator = principal != null && userService.findByEmail(principal.getName())
                 .orElseThrow(() -> new UsernameNotFoundException(principal.getName())).isModerator();
@@ -32,6 +33,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         return new ArrayList<>(postService.findAllOrderByTimeAsc());
     }
 
+    @Override
     public List<Post> getAllPostsByUserIdOrderByTimeAsc(Principal principal) {
         User user = userService.findByEmail(principal.getName())
                 .orElseThrow(() -> new UsernameNotFoundException(principal.getName()));

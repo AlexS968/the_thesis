@@ -12,7 +12,6 @@ import application.service.CaptchaCodeService;
 import application.service.LoginService;
 import application.service.PasswordService;
 import application.service.RegisterService;
-import application.service.mapper.CaptchaMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,7 +28,6 @@ public class ApiAuthController {
     private final LoginService loginService;
     private final PasswordService passwordService;
     private final RegisterService registerService;
-    private final CaptchaMapper captchaMapper;
 
     @GetMapping(value = "/check")
     public ResponseEntity<AuthenticationResponse> authCheck(Principal principal) {
@@ -39,8 +37,8 @@ public class ApiAuthController {
     @GetMapping(value = "/captcha")
     public ResponseEntity<CaptchaResponse> captcha() throws Exception {
         CaptchaCode captchaCode = captchaCodeService.captchaGenerator();
-        return ResponseEntity.ok(captchaMapper.convertToDto(
-                captchaCode, captchaCodeService.conversionToBase64(captchaCode)));
+        return ResponseEntity.ok(new CaptchaResponse(captchaCode,
+                captchaCodeService.conversionToBase64(captchaCode)));
     }
 
     @PostMapping("/restore")

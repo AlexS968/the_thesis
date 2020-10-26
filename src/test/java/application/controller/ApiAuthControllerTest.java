@@ -9,16 +9,13 @@ import application.api.response.AuthenticationResponse;
 import application.api.response.CaptchaResponse;
 import application.api.response.ResultResponse;
 import application.api.response.type.UserAuthCheckResponse;
-import application.exception.BadRequestException;
 import application.exception.apierror.ApiError;
 import application.exception.apierror.ApiValidationError;
 import application.persistence.model.CaptchaCode;
 import application.persistence.model.User;
-import application.persistence.repository.CaptchaCodeRepository;
 import application.persistence.repository.UserRepository;
 import application.service.impl.CaptchaCodeServiceImpl;
 import application.service.impl.LoginServiceImpl;
-import application.service.mapper.CaptchaMapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,9 +29,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.security.Principal;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 public class ApiAuthControllerTest extends AbstractIntegrationTest {
 
@@ -42,8 +37,6 @@ public class ApiAuthControllerTest extends AbstractIntegrationTest {
     private LoginServiceImpl loginService;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private CaptchaMapper captchaMapper;
     @Autowired
     PasswordEncoder encoder;
     @MockBean
@@ -106,8 +99,7 @@ public class ApiAuthControllerTest extends AbstractIntegrationTest {
         Mockito.when(captchaService.conversionToBase64(captchaCode)).thenReturn(
                 String.valueOf(captchaCode.hashCode()));
         //create a response
-        CaptchaResponse response = captchaMapper
-                .convertToDto(captchaCode, captchaService.conversionToBase64(captchaCode));
+        CaptchaResponse response = new CaptchaResponse(captchaCode, captchaService.conversionToBase64(captchaCode));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/auth/captcha"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -134,7 +126,7 @@ public class ApiAuthControllerTest extends AbstractIntegrationTest {
         ChangePasswordRequest request = new ChangePasswordRequest(HASH,
                 "password", CODE, SECRET_CODE);
         //mock methods from CaptchaService
-        Mockito.when(captchaService.captchaIsValid(CODE,SECRET_CODE)).thenReturn(true);
+        Mockito.when(captchaService.captchaIsValid(CODE, SECRET_CODE)).thenReturn(true);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/password")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -168,7 +160,7 @@ public class ApiAuthControllerTest extends AbstractIntegrationTest {
         RegisterRequest request = new RegisterRequest(NEW_EMAIL, "newPassword",
                 NAME, CODE, SECRET_CODE);
         //mock methods from CaptchaService
-        Mockito.when(captchaService.captchaIsValid(CODE,SECRET_CODE)).thenReturn(true);
+        Mockito.when(captchaService.captchaIsValid(CODE, SECRET_CODE)).thenReturn(true);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -235,7 +227,7 @@ public class ApiAuthControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = EMAIL, authorities = { "user:write" })
+    @WithMockUser(username = EMAIL, authorities = {"user:write"})
     public void shouldLogoutWhenUserAuthenticated() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/auth/logout")
                 .contentType(MediaType.APPLICATION_JSON)

@@ -2,7 +2,6 @@ package application.service;
 
 import application.persistence.model.Post;
 import application.persistence.repository.IPostCount;
-import application.persistence.repository.PostRepository;
 import application.service.impl.CalendarServiceImpl;
 import org.junit.Assert;
 import org.junit.Test;

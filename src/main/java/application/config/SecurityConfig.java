@@ -1,7 +1,5 @@
 package application.config;
 
-import application.security.RestAccessDeniedHandler;
-import application.security.RestAuthenticationEntryPoint;
 import application.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -22,16 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsServiceImpl userDetailsService;
 
-    @Bean
-    public RestAccessDeniedHandler accessDeniedHandler() {
-        return new RestAccessDeniedHandler();
-    }
-
-    @Bean
-    public RestAuthenticationEntryPoint unauthorizedHandler() {
-        return new RestAuthenticationEntryPoint();
-    }
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -39,10 +27,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
-                .and()
+/*                .and()
                 .exceptionHandling()
                 .accessDeniedHandler(accessDeniedHandler())
-                .authenticationEntryPoint(unauthorizedHandler())
+                .authenticationEntryPoint(unauthorizedHandler())*/
                 .and()
                 .formLogin().loginPage("/login").permitAll()
                 .and()

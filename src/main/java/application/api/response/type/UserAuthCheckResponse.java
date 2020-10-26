@@ -14,7 +14,7 @@ public class UserAuthCheckResponse {
     private String photo;
     private String email;
     @JsonProperty("moderation")
-    private boolean isModerator ;
+    private boolean isModerator;
     private int moderationCount;
     private boolean settings;
 }

@@ -363,9 +363,8 @@ public class ApiGeneralControllerTest extends AbstractIntegrationTest {
         //authenticate user by
         Mockito.when(mockPrincipal.getName()).thenReturn(USER_EMAIL_FLYWAY);
         //create request
-        PostCommentRequest request = new PostCommentRequest();
-        request.setPostId(2);
-        request.setText("test comment, test comment, test comment");
+        PostCommentRequest request = new PostCommentRequest(null,
+                2, "test comment, test comment, test comment");
         //create response
         CommentResponse response = new CommentResponse(
                 postCommentRepository.findMaxId() + 1);
