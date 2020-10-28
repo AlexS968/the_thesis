@@ -56,7 +56,7 @@ public class PostMapper {
         UserPostResponse userResponse = new UserPostResponse();
         modelMapper().map(post.getUser(), userResponse);
         response.setUser(userResponse);
-        response.setTimestamp(post.getTime().toEpochSecond(ZoneOffset.ofHours(2)));
+        response.setTimestamp(post.getTime().toEpochSecond(ZoneOffset.UTC));
         response.setLikeCount(post.getLikesNumber());
         response.setDislikeCount(post.dislikeVotesNumber());
 
@@ -65,7 +65,7 @@ public class PostMapper {
             for (int i = 0; i < comments.size(); i++) {
                 User commentator = comments.get(i).getUser();
                 commentResponses[i] = new PostCommentResponse(comments.get(i).getId(),
-                        comments.get(i).getTime().toEpochSecond(ZoneOffset.ofHours(2)),
+                        comments.get(i).getTime().toEpochSecond(ZoneOffset.UTC),
                         comments.get(i).getText(), new UserPostCommentResponse(commentator.getId(),
                         commentator.getName(), commentator.getPhoto()));
             }
