@@ -40,7 +40,7 @@ public class PostMapper {
         UserPostResponse userResponse = new UserPostResponse();
         modelMapper().map(post.getUser(), userResponse);
         response.setUser(userResponse);
-        response.setTimestamp(post.getTime().toEpochSecond(ZoneOffset.ofHours(2)));
+        response.setTimestamp(post.getTime().toEpochSecond(ZoneOffset.UTC));
         response.setAnnounce(post.getText().substring(0, Math.min(post.getText().length(), 100)) + "...");
         response.setLikeCount(post.getLikesNumber());
         response.setDislikeCount(post.dislikeVotesNumber());
