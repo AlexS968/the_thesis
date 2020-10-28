@@ -265,12 +265,19 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void increaseViewCounter(long id, Principal principal) {
-        User user = userService.findByEmail(principal.getName()).orElse(null);
         Post post = getPostByID(id);
-        //increase view counter under certain conditions
-        if (user == null || (!user.isModerator() & post.getUser().getId() != user.getId())) {
+        //increase view counter when user unauthorised
+        if (principal == null) {
             post.setViewCount(post.getViewCount() + 1);
             postRepository.save(post);
+        } else {
+            User user = userService.findByEmail(principal.getName())
+                    .orElseThrow(() -> new UsernameNotFoundException(principal.getName()));
+            //increase view counter under certain conditions
+            if (user == null || (!user.isModerator() & post.getUser().getId() != user.getId())) {
+                post.setViewCount(post.getViewCount() + 1);
+                postRepository.save(post);
+            }
         }
     }
 
