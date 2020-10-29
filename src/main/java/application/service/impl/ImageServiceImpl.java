@@ -26,8 +26,14 @@ public class ImageServiceImpl implements ImageService {
 
     private final UserService userService;
 
-    @Value("${upload.path}")
+    @Value("${upload.cloudinary.path}")
     private String uploadPath;
+    @Value("${upload.cloudinary.cloudName}")
+    private String cloudName;
+    @Value("${upload.cloudinary.apiKey}")
+    private String apiKey;
+    @Value("${upload.cloudinary.apiSecret}")
+    private String apiSecret;
 
     @Override
     public String uploadImage(MultipartFile file, Principal principal) throws IOException {
@@ -53,9 +59,9 @@ public class ImageServiceImpl implements ImageService {
                     .concat(File.separator).concat(RandomStringUtils.randomAlphanumeric(2))
                     .concat(File.separator).concat(RandomStringUtils.randomAlphanumeric(2));
             Map params = ObjectUtils.asMap(
-                    "cloud_name", "dxywt3ld7",
-                    "api_key", "372888264999633",
-                    "api_secret", "ZJfDjL0K6wxdvtZr-cz0ua0-VSY",
+                    "cloud_name", cloudName,
+                    "api_key", apiKey,
+                    "api_secret", apiSecret,
                     "folder", path
             );
             Cloudinary cloudinary = new Cloudinary(params);

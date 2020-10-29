@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,10 +37,10 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public TagToPost getOrSaveTag(String name, Post post) {
-        Tag tag = tagRepository.findByName(name).orElse(null);
-        return (tag == null) ? new TagToPost(post, tagRepository.save(new Tag(name))) :
-                tagToPostService.findByTagIdAndByPostId(tag.getId(), post.getId())
-                        .orElse(new TagToPost(post, tag));
+        Optional<Tag> tag = tagRepository.findByName(name);
+        return (tag.isEmpty()) ? new TagToPost(post, tagRepository.save(new Tag(name))) :
+                tagToPostService.findByTagIdAndByPostId(tag.get().getId(), post.getId())
+                        .orElse(new TagToPost(post, tag.get()));
     }
 
     @Override

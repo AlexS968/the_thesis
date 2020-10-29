@@ -33,8 +33,14 @@ public class RegisterServiceImpl implements RegisterService {
     private final GlobalSettingService globalSettingService;
     private final PasswordEncoder encoder;
 
-    @Value("${upload.path}")
+    @Value("${upload.cloudinary.path}")
     private String uploadPath;
+    @Value("${upload.cloudinary.cloudName}")
+    private String cloudName;
+    @Value("${upload.cloudinary.apiKey}")
+    private String apiKey;
+    @Value("${upload.cloudinary.apiSecret}")
+    private String apiSecret;
 
     @Override
     public ResultResponse createUser(RegisterRequest request) {
@@ -116,9 +122,9 @@ public class RegisterServiceImpl implements RegisterService {
             if (file.getSize() < 5242880L) {
                 //create instance of Cloudinary to save avatar
                 Map params = ObjectUtils.asMap(
-                        "cloud_name", "dxywt3ld7",
-                        "api_key", "372888264999633",
-                        "api_secret", "ZJfDjL0K6wxdvtZr-cz0ua0-VSY",
+                        "cloud_name", cloudName,
+                        "api_key", apiKey,
+                        "api_secret", apiSecret,
                         "folder", "skillbox/avatar"
                 );
                 Cloudinary cloudinary = new Cloudinary(params);
