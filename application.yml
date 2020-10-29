@@ -21,8 +21,8 @@ upload:
   cloudinary:
     path: ${CLOUDINARY_PATH}
     cloudName: ${CLOUD_NAME}
-    apiKey: ${API_KEY}
-    apiSecret: ${API_SECRET}
+    apiKey: ${CLOUDINARY_API_KEY}
+    apiSecret: ${CLOUDINARY_API_SECRET}
 
 server:
   port: ${PORT:8080}
