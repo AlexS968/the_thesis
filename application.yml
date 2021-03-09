@@ -34,13 +34,15 @@ captchaExpirationTime: 1
 
 blogInfo:
   title: "DevPub"
-  subtitle: "Program developer stories"
-  phone: "+7 903 666-44-55"
-  email: "a.sablin@mail.ru"
+  subtitle: "Software developer stories"
+  phone: "+49 111 1111111"
+  email: "alexey.sablin@gmx.de"
   copyright: "Alexey Sablin"
   copyrightFrom: "2020"
 
-
+UserAuthCheckResponse:
+  name: "authenticated username"
+  moderationCount: "number of posts to moderate"
 
 
 
